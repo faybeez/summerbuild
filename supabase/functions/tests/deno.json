@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "test:insert-clothes": "deno test --env-file=./.env.test --allow-env --allow-net --allow-read ./insert-clothes.test.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert",
+    "@std/path": "jsr:@std/path",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@2"
+  }
+}
