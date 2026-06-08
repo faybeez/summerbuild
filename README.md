@@ -1,6 +1,9 @@
 # SummerBuild
 
 ## Starting supabase
+
+Open the docker app.
+
 ```bash
 npx supabase start
 ```
