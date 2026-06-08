@@ -1,5 +1,25 @@
 # SummerBuild
 
+## Starting the application
+
+1. change directories.
+
+```bash
+cd app
+```
+
+2. open an emulator.
+
+3. change the `supabase_config.dart` file to use your own publishable key & url.
+
+For more information, check the section on starting supabase.
+
+4. run the app.
+
+```bash
+flutter run
+```
+
 ## Starting supabase
 
 Open the docker app.
