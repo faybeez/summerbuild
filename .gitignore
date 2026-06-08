@@ -73,6 +73,7 @@ migrate_working_dir/
 .flutter-plugins
 .flutter-plugins-dependencies
 supabase_config.dart
+app/lib/supabase_config.dart
 
 android/.gradle/
 android/app/build/
