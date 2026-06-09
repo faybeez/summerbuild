@@ -136,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () => context.go('/style-quiz'),
                     child: const Text('Forgot password?'),
                   ),
                 ),
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 18),
                 OutlinedButton.icon(
-                  onPressed: () {},
+                  onPressed: () => context.go('/style-quiz'),
                   icon: const Icon(Icons.auto_awesome),
                   label: const Text('Continue with style profile'),
                   style: OutlinedButton.styleFrom(

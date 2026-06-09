@@ -10,14 +10,6 @@ import 'classes.dart';
 import 'functions.dart';
 import 'router.dart';
 
-import 'features/pages/auth/login_page.dart';
-import 'features/pages/wardrobe_detail_page.dart';
-import 'features/pages/wardrobe_page.dart';
-import 'features/pages/calendar_page.dart';
-import 'features/pages/explore_page.dart';
-import 'features/pages/account_page.dart';
-import 'features/pages/auth/register_page.dart';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 

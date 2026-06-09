@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../app_colors.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({
@@ -88,6 +89,56 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
             _obscure
                 ? Icons.visibility_outlined
                 : Icons.visibility_off_outlined,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SelectableCard extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const SelectableCard({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Ink(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: selected
+                ? const Color.fromARGB(255, 255, 238, 219)
+                : AppColors.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: selected ? AppColors.appTerracotta : AppColors.border,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    color: selected ? AppColors.primary : AppColors.textMain,
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  ),
+                ),
+              ),
+              if (selected)
+                Icon(Icons.check, color: AppColors.primary, size: 18),
+            ],
           ),
         ),
       ),

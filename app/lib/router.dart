@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/pages/auth/login_page.dart';
 import 'features/pages/auth/register_page.dart';
+import 'features/pages/style_quiz/style_quiz_page.dart';
 import '../../features/pages/wardrobe_page.dart';
 import '../../features/pages/wardrobe_detail_page.dart';
 import '../../features/pages/calendar_page.dart';
@@ -21,7 +22,9 @@ final GoRouter appRouter = GoRouter(
     final isLoggedIn = session != null;
 
     final isAuthRoute =
-        state.uri.path == '/login' || state.uri.path == '/register';
+        state.uri.path == '/login' ||
+        state.uri.path == '/register' ||
+        state.uri.path == '/style-quiz';
 
     if (!isLoggedIn && !isAuthRoute) return '/login';
     if (isLoggedIn && isAuthRoute) return '/wardrobe';
@@ -33,6 +36,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterPage(),
+    ),
+    GoRoute(
+      path: '/style-quiz',
+      builder: (context, state) => const StyleQuizPage(),
     ),
 
     ShellRoute(
