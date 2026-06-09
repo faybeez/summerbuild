@@ -8,13 +8,15 @@ import 'supabase_config.dart';
 import 'app_colors.dart';
 import 'classes.dart';
 import 'functions.dart';
+import 'router.dart';
 
-import 'features/pages/login_page.dart';
+import 'features/pages/auth/login_page.dart';
 import 'features/pages/wardrobe_detail_page.dart';
 import 'features/pages/wardrobe_page.dart';
 import 'features/pages/calendar_page.dart';
 import 'features/pages/explore_page.dart';
 import 'features/pages/account_page.dart';
+import 'features/pages/auth/register_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,8 +36,8 @@ class WardrobeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Wardrobe',
+    return MaterialApp.router(
+      title: 'Wardrobe App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
@@ -137,7 +139,7 @@ class WardrobeApp extends StatelessWidget {
           displayColor: AppColors.appEspresso,
         ),
       ),
-      home: const LoginPage(),
+      routerConfig: appRouter,
     );
   }
 }

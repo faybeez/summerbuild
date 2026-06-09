@@ -11,7 +11,7 @@ import 'personalization_page.dart';
 import 'change_password_page.dart';
 import 'notifications_page.dart';
 import 'style_preferences_page.dart';
-import 'login_page.dart';
+import 'auth/login_page.dart';
 import 'settings_page.dart';
 
 class AccountPage extends StatefulWidget {

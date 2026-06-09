@@ -1,5 +1,5 @@
-const supabaseUrl = 'YOUR_SUPABASE_PROJECT_URL';
-const supabasePublishableKey = 'YOUR_SUPABASE_PUBLISHABLE_ANON_KEY';
+const supabaseUrl = 'http://10.0.2.2:54321';
+const supabasePublishableKey = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
 
 bool get hasSupabaseConfig =>
     !supabaseUrl.startsWith('YOUR_') &&

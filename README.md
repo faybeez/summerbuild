@@ -14,6 +14,8 @@ cd app
 
 For more information, check the section on starting supabase.
 
+Note: when self-hosting supabase and using an android emulator, use http://10.0.2.2:54321 as the supabase URL (instead of 172).
+
 4. run the app.
 
 ```bash

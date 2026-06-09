@@ -1,18 +1,16 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../app_colors.dart';
-import '../../classes.dart';
-import '../../supabase_config.dart';
+import '../../../app_colors.dart';
+import '../../../supabase_config.dart';
+import '../../widgets/inputs.dart';
 
-import 'wardrobe_page.dart';
-import 'home_page.dart';
-import 'calendar_page.dart';
-import 'explore_page.dart';
-import 'account_page.dart';
+import '../wardrobe_page.dart';
+import '../home_page.dart';
+import '../calendar_page.dart';
+import '../explore_page.dart';
+import '../account_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -109,38 +107,20 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 const LoginHeader(),
                 const SizedBox(height: 34),
-                TextField(
+                AppTextField(
                   controller: _emailController,
+                  labelText: 'Email',
+                  hintText: 'name@example.com',
+                  prefixIcon: Icons.mail_outline,
+                  keyboardType: TextInputType.emailAddress,
                   autofocus: true,
-                  keyboardType: TextInputType.text,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: 'Email',
-                    hintText: 'name@example.com',
-                    prefixIcon: Icon(Icons.mail_outline),
-                  ),
                 ),
                 const SizedBox(height: 14),
-                TextField(
+                AppPasswordField(
                   controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  textInputAction: TextInputAction.done,
+                  labelText: 'Password',
+                  hintText: 'Enter your password',
                   onSubmitted: (_) => _signIn(),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    hintText: 'Enter your password',
-                    prefixIcon: const Icon(Icons.lock_outline),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() => _obscurePassword = !_obscurePassword);
-                      },
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                      ),
-                    ),
-                  ),
                 ),
                 if (_errorMessage != null) ...[
                   const SizedBox(height: 12),
@@ -198,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () => context.go('/register'),
                       child: const Text('Create account'),
                     ),
                   ],
