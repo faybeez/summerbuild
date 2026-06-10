@@ -3,7 +3,7 @@ CREATE TABLE IF NOT EXISTS public.tags (
     tag_type text NOT NULL,
     tag_name text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    created_by uuid NOT NULL REFERENCES auth.users(id) DEFAULT SYSTEM_USER ON DELETE SET NULL
+    created_by uuid DEFAULT NULL REFERENCES auth.users(id) ON DELETE CASCADE
 );
 
 ALTER TABLE public.tags OWNER TO postgres;

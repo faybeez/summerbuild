@@ -5,8 +5,7 @@ enum StyleExperienceLevel { beginner, emerging, confident, advanced }
 class StyleQuizState {
   StyleExperienceLevel? experience;
   String? experienceDetail;
-  String? vibeBeginner;
-  Set<String> vibeAdvanced;
+  Set<String> vibeTags;
   String? colorGroup;
   String? fitPreference;
   Set<String> systems;
@@ -15,15 +14,14 @@ class StyleQuizState {
   StyleQuizState({
     this.experience,
     this.experienceDetail,
-    this.vibeBeginner,
-    Set<String>? vibeAdvanced,
+    Set<String>? vibeTags,
     this.colorGroup,
     this.fitPreference,
     Set<String>? systems,
     Set<String>? goals,
-  }) : vibeAdvanced = vibeAdvanced ?? <String>{},
+  }) : vibeTags = vibeTags ?? <String>{},
        systems = systems ?? <String>{},
        goals = goals ?? <String>{};
 
-  int get totalSteps => 7;
+  int get totalSteps => 7; // hidden intro + experience + 5 qns
 }

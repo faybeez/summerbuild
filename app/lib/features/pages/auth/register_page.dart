@@ -80,7 +80,7 @@ class _RegisterPageState extends State<RegisterPage> {
       if (res.session == null && res.user != null) {
         context.go('/verify-email', extra: email);
       } else if (res.session != null) {
-        context.go('/wardrobe');
+        context.go('/home');
       }
     } on AuthException catch (error) {
       if (mounted) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import '../../../app_colors.dart';
 
 class AppTextField extends StatelessWidget {
@@ -97,25 +98,58 @@ class _AppPasswordFieldState extends State<AppPasswordField> {
 }
 
 class SelectableCard extends StatelessWidget {
-  final String label;
+  final String? label;
+  final Widget? child;
   final bool selected;
   final VoidCallback onTap;
+  final double? horizontalPadding;
+  final double? verticalPadding;
 
   const SelectableCard({
-    required this.label,
+    this.label,
+    this.child,
     required this.selected,
     required this.onTap,
-  });
+    this.horizontalPadding,
+    this.verticalPadding,
+  }) : assert(
+         label != null || child != null,
+         'Either label or child must be provided',
+       );
 
   @override
   Widget build(BuildContext context) {
+    final Widget content =
+        child ??
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                label!,
+                style: TextStyle(
+                  color: selected ? AppColors.primary : AppColors.textMain,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
+            if (selected) Icon(Icons.check, color: AppColors.primary, size: 18),
+          ],
+        );
+
+    // use instance values, with defaults
+    final double hPadding = horizontalPadding ?? 16.0;
+    final double vPadding = verticalPadding ?? 14.0;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Ink(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: EdgeInsets.symmetric(
+            horizontal: hPadding,
+            vertical: vPadding,
+          ),
           decoration: BoxDecoration(
             color: selected
                 ? const Color.fromARGB(255, 255, 238, 219)
@@ -125,21 +159,7 @@ class SelectableCard extends StatelessWidget {
               color: selected ? AppColors.appTerracotta : AppColors.border,
             ),
           ),
-          child: Row(
-            children: [
-              Expanded(
-                child: Text(
-                  label,
-                  style: TextStyle(
-                    color: selected ? AppColors.primary : AppColors.textMain,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                  ),
-                ),
-              ),
-              if (selected)
-                Icon(Icons.check, color: AppColors.primary, size: 18),
-            ],
-          ),
+          child: content,
         ),
       ),
     );

@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted && res.session == null && res.user != null) {
         context.go('/verify-email', extra: email);
       } else if (mounted && res.session != null) {
-        context.go('/wardrobe');
+        context.go('/home');
       }
     } on AuthException catch (error) {
       if (mounted) {

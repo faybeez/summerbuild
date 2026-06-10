@@ -26,8 +26,7 @@ final GoRouter appRouter = GoRouter(
     final isAuthRoute =
         state.uri.path == '/login' ||
         state.uri.path == '/register' ||
-        state.uri.path == '/verify-email' ||
-        state.uri.path == '/style-quiz';
+        state.uri.path == '/verify-email';
 
     if (!isLoggedIn && !isAuthRoute) return '/login';
     if (isLoggedIn && isAuthRoute) return '/wardrobe';

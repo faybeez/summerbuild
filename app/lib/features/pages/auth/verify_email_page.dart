@@ -69,7 +69,9 @@ class _VerifyEmailPageState extends State<VerifyEmailPage> {
         context.go('/style-quiz');
       }
     } on AuthException catch (e) {
+      debugPrint('OTP verification error: ${e}');
       if (mounted) {
+        debugPrint('OTP verification error: ${e}');
         setState(() => _errorMessage = e.message);
         _clearOtp();
       }
