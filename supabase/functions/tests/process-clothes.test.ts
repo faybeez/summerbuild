@@ -6,7 +6,7 @@ const SUPABASE_URL = requiredEnv("SUPABASE_URL");
 const SUPABASE_ANON_KEY = requiredEnv("SUPABASE_ANON_KEY");
 const EMAIL = requiredEnv("EMAIL");
 const PASSWORD = requiredEnv("PASSWORD");
-const IMAGE_PATH = requiredEnv("IMAGE_PATH");
+const IMAGE_PATH = requiredEnv("IMAGE_PATH2");
 const OPTIONS = {
   auth: {
     autoRefreshToken: false,
@@ -19,7 +19,7 @@ function getFileName(path: string): string {
   return path.split(/[\\/]/).pop() ?? "photo.png";
 }
 
-Deno.test("insert-clothes", async () => {
+Deno.test("process-clothes", async () => {
   var client: SupabaseClient = createClient(
     SUPABASE_URL,
     SUPABASE_ANON_KEY,
@@ -30,10 +30,6 @@ Deno.test("insert-clothes", async () => {
   const fileName = getFileName(IMAGE_PATH);
 
   const formData = new FormData();
-  formData.append("cost", "49.99");
-  formData.append("times_worn", "0");
-  formData.append("tag_ids", JSON.stringify([1, 3, 6]));
-
   formData.append(
     "image",
     new File([imageBytes], fileName, { type: "image/png" }),
@@ -50,7 +46,7 @@ Deno.test("insert-clothes", async () => {
   }
   const accessToken = data.session!.access_token;
 
-  const { response } = await client.functions.invoke("insert-clothes", {
+  const { response } = await client.functions.invoke("process-clothes", {
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${accessToken}`,

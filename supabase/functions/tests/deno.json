@@ -1,8 +1,10 @@
 {
   "tasks": {
-    "test:insert-clothes": "deno test --env-file=./.env.test --allow-env --allow-net --allow-read ./insert-clothes.test.ts"
+    "test:insert-clothes": "deno test --env-file=./.env.test --allow-env --allow-net --allow-read ./insert-clothes.test.ts",
+    "test:process-clothes": "deno test --env-file=./.env.test --allow-env --allow-net --allow-read ./process-clothes.test.ts"
   },
   "imports": {
+    "@openai/openai": "jsr:@openai/openai@^6.42.0",
     "@std/assert": "jsr:@std/assert",
     "@std/path": "jsr:@std/path",
     "@supabase/supabase-js": "npm:@supabase/supabase-js@2"

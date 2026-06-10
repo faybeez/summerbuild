@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public.clothes (
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     cost real,
     times_worn integer DEFAULT 0 NOT NULL,
+    is_favorite boolean DEFAULT false NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     edited_at timestamp with time zone DEFAULT now() NOT NULL
 );

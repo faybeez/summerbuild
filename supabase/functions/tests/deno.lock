@@ -1,13 +1,21 @@
 {
   "version": "5",
   "specifiers": {
+    "jsr:@openai/openai@^6.42.0": "6.42.0",
     "jsr:@std/assert@*": "1.0.19",
     "jsr:@std/internal@^1.0.12": "1.0.14",
     "jsr:@std/internal@^1.0.14": "1.0.14",
     "jsr:@std/path@*": "1.1.5",
-    "npm:@supabase/supabase-js@2": "2.106.2"
+    "npm:@supabase/supabase-js@2": "2.106.2",
+    "npm:zod@3": "3.25.76"
   },
   "jsr": {
+    "@openai/openai@6.42.0": {
+      "integrity": "9c1b51ea00bd6bc5279e7b7f9252c7819f136f02f3a98a3bf15764ae5dd5a3cc",
+      "dependencies": [
+        "npm:zod"
+      ]
+    },
     "@std/assert@1.0.19": {
       "integrity": "eaada96ee120cb980bc47e040f82814d786fe8162ecc53c91d8df60b8755991e",
       "dependencies": [
@@ -75,10 +83,14 @@
     },
     "tslib@2.8.1": {
       "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
+    },
+    "zod@3.25.76": {
+      "integrity": "sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ=="
     }
   },
   "workspace": {
     "dependencies": [
+      "jsr:@openai/openai@^6.42.0",
       "jsr:@std/assert@*",
       "jsr:@std/path@*",
       "npm:@supabase/supabase-js@2"

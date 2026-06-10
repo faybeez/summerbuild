@@ -41,7 +41,7 @@ FROM (
         ('Occasion', 'Beach'),
         ('Occasion', 'Home'),
         ('Occasion', 'Loungewear'),
-        ('Occasion', 'Sleepwear'),
+        ('Occasion', 'Sleepwear')
 ) AS new_tags(tag_type, tag_name)
 WHERE NOT EXISTS (
     SELECT 1
@@ -61,7 +61,7 @@ FROM (
         ('Weather Fit', 'Rainy Weather'),
         ('Weather Fit', 'Windy Weather'),
         ('Weather Fit', 'Humid Weather'),
-        ('Weather Fit', 'Dry Weather'),
+        ('Weather Fit', 'Dry Weather')
 ) AS new_tags(tag_type, tag_name)
 WHERE NOT EXISTS (
     SELECT 1
