@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../../classes.dart';
+import '../../../classes.dart';
 
 class EditEventPage extends StatefulWidget {
   const EditEventPage({required this.event, super.key});

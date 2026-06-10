@@ -6,9 +6,9 @@ import '../../../app_colors.dart';
 import '../../../supabase_config.dart';
 import '../../widgets/inputs.dart';
 
-import '../wardrobe_page.dart';
+import '../wardrobe/wardrobe_page.dart';
 import '../home_page.dart';
-import '../calendar_page.dart';
+import '../calendar/calendar_page.dart';
 import '../explore_page.dart';
 import '../account_page.dart';
 
@@ -31,12 +31,6 @@ class _LoginPageState extends State<LoginPage> {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
-  }
-
-  void _openWardrobe() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const WardrobeShell()),
-    );
   }
 
   Future<void> _signIn() async {
@@ -66,17 +60,21 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     try {
-      await Supabase.instance.client.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      final AuthResponse res = await Supabase.instance.client.auth
+          .signInWithPassword(email: email, password: password);
 
-      if (mounted) {
-        _openWardrobe();
+      if (mounted && res.session == null && res.user != null) {
+        context.go('/verify-email', extra: email);
+      } else if (mounted && res.session != null) {
+        context.go('/wardrobe');
       }
     } on AuthException catch (error) {
       if (mounted) {
-        setState(() => _errorMessage = error.message);
+        if (error.message.contains('Email not confirmed')) {
+          context.go('/verify-email', extra: email);
+        } else {
+          setState(() => _errorMessage = error.message);
+        }
       }
     } catch (_) {
       if (mounted) {

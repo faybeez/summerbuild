@@ -7,7 +7,7 @@ import '../../app_colors.dart';
 import '../../classes.dart';
 import '../../functions.dart';
 
-import 'wardrobe_detail_page.dart';
+import 'wardrobe/wardrobe_detail_page.dart';
 
 class OutfitDetailPage extends StatelessWidget {
   const OutfitDetailPage({

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../app_colors.dart';
-import '../../functions.dart';
+import '../../../app_colors.dart';
+import '../../../functions.dart';
 
 class NotificationsPage extends StatefulWidget {
   const NotificationsPage({super.key});

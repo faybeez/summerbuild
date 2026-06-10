@@ -5,15 +5,20 @@ class MainShell extends StatelessWidget {
   final Widget child;
   const MainShell({super.key, required this.child});
 
-  static const _tabs = ['/wardrobe', '/calendar', '/explore', '/account'];
+  static const _tabs = [
+    '/wardrobe',
+    '/calendar',
+    '/home',
+    '/explore',
+    '/account',
+  ];
 
   int _selectedIndex(BuildContext context) {
     final location = GoRouterState.of(context).uri.path;
-    // Match by prefix so nested routes (e.g. /wardrobe/detail) keep wardrobe selected
     for (int i = 0; i < _tabs.length; i++) {
       if (location.startsWith(_tabs[i])) return i;
     }
-    return 0;
+    return 2;
   }
 
   @override
@@ -29,6 +34,7 @@ class MainShell extends StatelessWidget {
             icon: Icon(Icons.calendar_month),
             label: 'Calendar',
           ),
+          NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
           NavigationDestination(icon: Icon(Icons.explore), label: 'Explore'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Account'),
         ],

@@ -69,13 +69,17 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      await Supabase.instance.client.auth.signUp(
+      final AuthResponse res = await Supabase.instance.client.auth.signUp(
         email: email,
         password: password,
         data: {'display_name': name},
       );
 
-      if (mounted) {
+      if (!mounted) return;
+
+      if (res.session == null && res.user != null) {
+        context.go('/verify-email', extra: email);
+      } else if (res.session != null) {
         context.go('/wardrobe');
       }
     } on AuthException catch (error) {

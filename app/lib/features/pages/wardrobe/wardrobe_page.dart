@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../app_colors.dart';
-import '../../classes.dart';
-import '../../functions.dart';
+import '../../../app_colors.dart';
+import '../../../classes.dart';
+import '../../../functions.dart';
 
 import 'wardrobe_detail_page.dart';
 import 'add_item_page.dart';

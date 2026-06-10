@@ -5,10 +5,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/pages/auth/login_page.dart';
 import 'features/pages/auth/register_page.dart';
+import 'features/pages/auth/verify_email_page.dart';
 import 'features/pages/style_quiz/style_quiz_page.dart';
-import '../../features/pages/wardrobe_page.dart';
-import '../../features/pages/wardrobe_detail_page.dart';
-import '../../features/pages/calendar_page.dart';
+import 'features/pages/wardrobe/wardrobe_page.dart';
+import 'features/pages/wardrobe/wardrobe_detail_page.dart';
+import 'features/pages/calendar/calendar_page.dart';
+import 'features/pages/home_page.dart';
 import '../../features/pages/explore_page.dart';
 import '../../features/pages/account_page.dart';
 
@@ -24,6 +26,7 @@ final GoRouter appRouter = GoRouter(
     final isAuthRoute =
         state.uri.path == '/login' ||
         state.uri.path == '/register' ||
+        state.uri.path == '/verify-email' ||
         state.uri.path == '/style-quiz';
 
     if (!isLoggedIn && !isAuthRoute) return '/login';
@@ -36,6 +39,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterPage(),
+    ),
+    GoRoute(
+      path: '/verify-email',
+      builder: (context, state) {
+        final email = state.extra as String;
+        return VerifyEmailPage(email: email);
+      },
     ),
     GoRoute(
       path: '/style-quiz',
@@ -70,6 +80,7 @@ final GoRouter appRouter = GoRouter(
           path: '/account',
           builder: (context, state) => const AccountPage(),
         ),
+        GoRoute(path: '/home', builder: (context, state) => const HomePage()),
       ],
     ),
   ],

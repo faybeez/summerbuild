@@ -71,6 +71,10 @@ class _StyleQuizPageState extends State<StyleQuizPage> {
         ];
       default:
         return [
+          Text(
+            'Step ${_stepIndex + 1} of ${_quizState.totalSteps}',
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
             child: LinearProgressIndicator(
