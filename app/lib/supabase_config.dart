@@ -1,4 +1,4 @@
-const supabaseUrl = 'http://10.0.2.2:54321';
+const supabaseUrl = 'http://192.168.0.101:54321';
 const supabasePublishableKey = 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH';
 
 bool get hasSupabaseConfig =>

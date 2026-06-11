@@ -12,12 +12,6 @@ import 'steps/3_fit_preference.dart';
 import 'steps/4_vibe_tags.dart';
 import 'steps/5_systems.dart';
 import 'steps/6_goals.dart';
-// import 'steps/step_experience_detail.dart';
-// import 'steps/step_vibe.dart';
-// import 'steps/step_color.dart';
-// import 'steps/step_fit.dart';
-// import 'steps/step_systems.dart';
-// import 'steps/step_goals.dart';
 
 class StyleQuizPage extends StatefulWidget {
   const StyleQuizPage({super.key});
@@ -33,35 +27,21 @@ class _StyleQuizPageState extends State<StyleQuizPage> {
   bool get _isCurrentStepValid {
     switch (_stepIndex) {
       case 0:
-        // Intro: always allow Next
         return true;
-
       case 1:
-        // Experience must be chosen
         return _quizState.experience != null;
-
-      case 4:
-        // Vibe tags: require at least one selection
-        return _quizState.vibeTags.isNotEmpty;
-
       case 2:
-        // Color group: must be chosen
         return _quizState.colorGroup != null &&
             _quizState.colorGroup!.isNotEmpty;
-
       case 3:
-        // Fit preference: must be chosen
         return _quizState.fitPreference != null &&
             _quizState.fitPreference!.isNotEmpty;
-
+      case 4:
+        return _quizState.vibeTags.isNotEmpty;
       case 5:
-        // Systems: require at least one selection
         return _quizState.systems.isNotEmpty;
-
       case 6:
-        // Goals: require at least one selection
         return _quizState.goals.isNotEmpty;
-
       default:
         return false;
     }
@@ -99,11 +79,7 @@ class _StyleQuizPageState extends State<StyleQuizPage> {
       'goals': _quizState.goals.toList(),
     };
 
-    final payload = {
-      'user_id': user.id,
-      ...rawQuiz,
-      'raw_quiz': rawQuiz,
-    }; // add raw quiz for ai query
+    final payload = {'user_id': user.id, ...rawQuiz, 'raw_quiz': rawQuiz};
 
     try {
       await client.from('style_profiles').upsert(payload);
@@ -127,10 +103,9 @@ class _StyleQuizPageState extends State<StyleQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(backgroundColor: AppColors.background, elevation: 0),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(children: _buildIntroOrStep()),
         ),
       ),

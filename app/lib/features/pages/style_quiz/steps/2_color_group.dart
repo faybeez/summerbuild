@@ -132,43 +132,37 @@ class ColorGroupStep extends StatelessWidget {
           style: TextStyle(color: AppColors.textMuted, height: 1.4),
         ),
         const SizedBox(height: 36),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: options.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.1,
-          ),
-          itemBuilder: (context, index) {
-            final option = options[index];
-            final selected = state.colorGroup == option.value;
-
-            return SelectableCard(
-              selected: selected,
-              onTap: () {
-                state.colorGroup = option.value;
-                onChanged();
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _ColorSwatchRow(colors: option.swatch),
-                  const SizedBox(height: 8),
-                  Text(
-                    option.label,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: selected ? AppColors.primary : AppColors.textMain,
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+        Column(
+          children: [
+            for (int i = 0; i < options.length; i += 2)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: _buildColorCard(
+                        option: options[i],
+                        state: state,
+                        onChanged: onChanged,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    // Guard for odd-count lists
+                    if (i + 1 < options.length)
+                      Expanded(
+                        child: _buildColorCard(
+                          option: options[i + 1],
+                          state: state,
+                          onChanged: onChanged,
+                        ),
+                      )
+                    else
+                      const Expanded(child: SizedBox()),
+                  ],
+                ),
               ),
-            );
-          },
+          ],
         ),
       ],
     );
@@ -218,4 +212,36 @@ class _ColorSwatchRow extends StatelessWidget {
       },
     );
   }
+}
+
+Widget _buildColorCard({
+  required _ColorOption option,
+  required StyleQuizState state,
+  required VoidCallback onChanged,
+}) {
+  final selected = state.colorGroup == option.value;
+
+  return SelectableCard(
+    selected: selected,
+    onTap: () {
+      state.colorGroup = option.value;
+      onChanged();
+    },
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min, // sizes to content
+      children: [
+        _ColorSwatchRow(colors: option.swatch),
+        const SizedBox(height: 8),
+        Text(
+          option.label,
+          style: TextStyle(
+            fontSize: 12,
+            color: selected ? AppColors.primary : AppColors.textMain,
+            fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+          ),
+        ),
+      ],
+    ),
+  );
 }

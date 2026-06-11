@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../classes.dart';
 
@@ -76,11 +77,7 @@ class _AccountPageState extends State<AccountPage> {
         SettingsTile(
           icon: Icons.tune,
           title: 'Style preferences',
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const StylePreferencesPage()),
-            );
-          },
+          onTap: () => context.go('/style-quiz'),
         ),
         SettingsTile(
           icon: Icons.settings_outlined,

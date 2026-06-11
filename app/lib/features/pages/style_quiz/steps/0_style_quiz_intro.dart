@@ -27,7 +27,7 @@ class StyleQuizIntro extends StatelessWidget {
             'assets/hanger_logo.svg',
             width: 300,
             height: 300,
-          ), // or SvgPicture.asset(...)
+          ),
         ),
         const SizedBox(height: 24),
         Text(

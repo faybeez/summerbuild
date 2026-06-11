@@ -1,20 +1,56 @@
-// lib/core/router/app_router.dart
-
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'features/pages/auth/login_page.dart';
 import 'features/pages/auth/register_page.dart';
 import 'features/pages/auth/verify_email_page.dart';
+
 import 'features/pages/style_quiz/style_quiz_page.dart';
+
+import 'features/pages/main_shell.dart';
+
 import 'features/pages/wardrobe/wardrobe_page.dart';
+import 'features/pages/wardrobe/add_item/wardrobe_add_page.dart';
 import 'features/pages/wardrobe/wardrobe_detail_page.dart';
+
 import 'features/pages/calendar/calendar_page.dart';
+
 import 'features/pages/home/home_page.dart';
+
 import 'features/pages/explore/explore_page.dart';
+
 import 'features/pages/account/account_page.dart';
 
-import '../../features/pages/main_shell.dart';
+import 'features/data/tags_repository.dart';
+
+TagsRepository? _tagsRepository;
+String? _cachedUserId;
+
+TagsRepository getTagsRepository() {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+
+  if (user == null) {
+    throw StateError(
+      'TagsRepository cannot be created without a logged-in user.',
+    );
+  }
+
+  final shouldCreateNewRepository =
+      _tagsRepository == null || _cachedUserId != user.id;
+
+  if (shouldCreateNewRepository) {
+    _cachedUserId = user.id;
+    _tagsRepository = TagsRepository(supabase);
+  }
+
+  return _tagsRepository!;
+}
+
+void clearUserScopedRepositories() {
+  _tagsRepository = null;
+  _cachedUserId = null;
+}
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/wardrobe',
@@ -28,9 +64,14 @@ final GoRouter appRouter = GoRouter(
         state.uri.path == '/register' ||
         state.uri.path == '/verify-email';
 
-    if (!isLoggedIn && !isAuthRoute) return '/login';
+    if (!isLoggedIn) {
+      clearUserScopedRepositories();
+      if (!isAuthRoute) return '/login';
+    }
+
     if (isLoggedIn && isAuthRoute) return '/wardrobe';
-    return null; // no redirect
+
+    return null;
   },
 
   routes: [
@@ -56,16 +97,17 @@ final GoRouter appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/wardrobe',
-          builder: (context, state) => const WardrobePage(),
-          // routes: [
-          //   GoRoute(
-          //     path: 'detail',
-          //     builder: (context, state) {
-          //       final item = state.extra;
-          //       return WardrobeDetailPage(item: item);
-          //     },
-          //   ),
-          // ],
+          builder: (context, state) {
+            return WardrobePage(tagsRepository: getTagsRepository());
+          },
+          routes: [
+            GoRoute(
+              path: 'add',
+              builder: (context, state) {
+                return WardrobeAddPage(tagsRepository: getTagsRepository());
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/calendar',

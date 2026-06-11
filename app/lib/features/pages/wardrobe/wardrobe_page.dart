@@ -1,18 +1,19 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app_colors.dart';
 import '../../../classes.dart';
 import '../../../functions.dart';
+import '../../data/tags_repository.dart';
 
 import 'wardrobe_detail_page.dart';
-import 'add_item_page.dart';
 
 class WardrobePage extends StatefulWidget {
-  const WardrobePage({super.key});
+  const WardrobePage({super.key, required this.tagsRepository});
+
+  final TagsRepository tagsRepository;
 
   @override
   State<WardrobePage> createState() => _WardrobePageState();
@@ -64,7 +65,7 @@ class _WardrobePageState extends State<WardrobePage> {
     ),
   ];
 
-  late Future<List<String>> _categoriesFuture;
+  late final Future<List<ClothingTag>> _categoryTagsFuture;
 
   String _selectedCategory = 'All';
 
@@ -75,7 +76,7 @@ class _WardrobePageState extends State<WardrobePage> {
   @override
   void initState() {
     super.initState();
-    _categoriesFuture = getClothesCategories();
+    _categoryTagsFuture = widget.tagsRepository.getTags(type: 'CATEGORY');
   }
 
   @override
@@ -86,14 +87,7 @@ class _WardrobePageState extends State<WardrobePage> {
       title: 'Wardrobe',
       subtitle: '${filtered.length} saved pieces',
       trailing: IconButton.filledTonal(
-        onPressed: () async {
-          final item = await Navigator.of(context).push<WardrobeItem>(
-            MaterialPageRoute(builder: (_) => const AddItemPage()),
-          );
-          if (item != null && mounted) {
-            setState(() => _allItems.add(item));
-          }
-        },
+        onPressed: () => context.go('/wardrobe/add'),
         icon: const Icon(Icons.add),
       ),
       children: [
@@ -101,7 +95,9 @@ class _WardrobePageState extends State<WardrobePage> {
           spacing: 2,
           children: [
             FutureBuilder<List<String>>(
-              future: _categoriesFuture,
+              future: _categoryTagsFuture.then(
+                (tags) => ['All', ...tags.map((t) => t.tagDisplayName)],
+              ),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return const CircularProgressIndicator();

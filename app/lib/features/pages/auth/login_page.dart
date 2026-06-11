@@ -6,12 +6,6 @@ import '../../../app_colors.dart';
 import '../../../supabase_config.dart';
 import '../../widgets/inputs.dart';
 
-import '../wardrobe/wardrobe_page.dart';
-import '../home/home_page.dart';
-import '../calendar/calendar_page.dart';
-import '../explore/explore_page.dart';
-import '../account/account_page.dart';
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -228,68 +222,6 @@ class LoginHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class WardrobeShell extends StatefulWidget {
-  const WardrobeShell({super.key});
-
-  @override
-  State<WardrobeShell> createState() => _WardrobeShellState();
-}
-
-class _WardrobeShellState extends State<WardrobeShell> {
-  int _selectedIndex = 2;
-
-  static const _pages = [
-    WardrobePage(),
-    CalendarPage(),
-    HomePage(),
-    ExplorePage(),
-    AccountPage(),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: IndexedStack(index: _selectedIndex, children: _pages),
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _selectedIndex,
-        onDestinationSelected: (index) {
-          setState(() => _selectedIndex = index);
-        },
-        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.checkroom_outlined),
-            selectedIcon: Icon(Icons.checkroom),
-            label: 'Wardrobe',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.calendar_month_outlined),
-            selectedIcon: Icon(Icons.calendar_month),
-            label: 'Calendar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.travel_explore_outlined),
-            selectedIcon: Icon(Icons.travel_explore),
-            label: 'Explore',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.person_outline),
-            selectedIcon: Icon(Icons.person),
-            label: 'Account',
-          ),
-        ],
-      ),
     );
   }
 }

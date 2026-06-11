@@ -42,7 +42,7 @@ Future<List<String>> getWeatherTypes() async {
   return ['All', ...categories];
 }
 
-Future<List<String>> fetchColors() async {
+Future<List<String>> getColors() async {
   final data = await Supabase.instance.client
       .from('tags')
       .select('tag_name')

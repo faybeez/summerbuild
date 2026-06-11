@@ -2,6 +2,29 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'functions.dart';
 
+class ClothingTag {
+  final int id;
+  final String tagType;
+  final String tagValue;
+  final String tagDisplayName;
+
+  const ClothingTag({
+    required this.id,
+    required this.tagType,
+    required this.tagValue,
+    required this.tagDisplayName,
+  });
+
+  factory ClothingTag.fromJson(Map<String, dynamic> json) {
+    return ClothingTag(
+      id: json['id'] as int,
+      tagType: json['tag_type'] as String,
+      tagValue: json['tag_value'] as String,
+      tagDisplayName: json['tag_display_name'] as String,
+    );
+  }
+}
+
 class AppPage extends StatelessWidget {
   const AppPage({
     required this.title,
@@ -60,6 +83,45 @@ class AppPage extends StatelessWidget {
       ],
     );
   }
+}
+
+class DashedBorderPainter extends CustomPainter {
+  final Color color;
+
+  const DashedBorderPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+
+    const dashWidth = 8.0;
+    const dashSpace = 6.0;
+    final rrect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, size.width, size.height),
+      const Radius.circular(24),
+    );
+
+    final path = Path()..addRRect(rrect);
+    final dashPath = Path();
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0.0;
+      while (distance < metric.length) {
+        dashPath.addPath(
+          metric.extractPath(distance, distance + dashWidth),
+          Offset.zero,
+        );
+        distance += dashWidth + dashSpace;
+      }
+    }
+    canvas.drawPath(dashPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant DashedBorderPainter old) => old.color != color;
 }
 
 class ForecastCard extends StatelessWidget {
