@@ -64,21 +64,19 @@ class _WardrobePageState extends State<WardrobePage> {
     ),
   ];
 
-  static const _categories = [
-    'All',
-    'Tops',
-    'Bottoms',
-    'Outerwear',
-    'Shoes',
-    'Dresses',
-    'Accessories',
-  ];
+  late Future<List<String>> _categoriesFuture;
 
   String _selectedCategory = 'All';
 
   List<WardrobeItem> get _filteredItems => _selectedCategory == 'All'
       ? _allItems
       : _allItems.where((i) => i.category == _selectedCategory).toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _categoriesFuture = getClothesCategories();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -100,20 +98,38 @@ class _WardrobePageState extends State<WardrobePage> {
       ),
       children: [
         Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: _categories.map((category) {
-            final selected = _selectedCategory == category;
-            return FilterChip(
-              label: Text(category),
-              selected: selected,
-              onSelected: (_) {
-                setState(() => _selectedCategory = category);
+          spacing: 2,
+          children: [
+            FutureBuilder<List<String>>(
+              future: _categoriesFuture,
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                }
+
+                final categories = snapshot.data!;
+
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: categories.map((category) {
+                      return Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: FilterChip(
+                          label: Text(category),
+                          selected: _selectedCategory == category,
+                          onSelected: (_) {
+                            setState(() => _selectedCategory = category);
+                          },
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                );
               },
-            );
-          }).toList(),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
         GridView.builder(
           itemCount: filtered.length,
           shrinkWrap: true,
