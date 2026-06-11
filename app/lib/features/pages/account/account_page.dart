@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../classes.dart';
+import '../../../classes.dart';
 
 import 'personalization_page.dart';
-import 'settings/change_password_page.dart';
-import 'settings/notifications_page.dart';
+import 'change_password_page.dart';
+import 'notifications_page.dart';
 import 'style_preferences_page.dart';
-import 'auth/login_page.dart';
-import 'settings/settings_page.dart';
+import '../auth/login_page.dart';
+import 'settings_page.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({super.key});

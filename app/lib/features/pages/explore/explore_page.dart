@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../app_colors.dart';
-import '../../classes.dart';
+import '../../../app_colors.dart';
+import '../../../classes.dart';
 
-import 'article_page.dart';
+import '../home/article_page.dart';
 
 class ExplorePage extends StatelessWidget {
   const ExplorePage({super.key});
