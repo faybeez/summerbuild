@@ -24,7 +24,7 @@ class MainShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: child,
+      body: Padding(padding: const EdgeInsets.only(top: 32.0), child: child),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex(context),
         onDestinationSelected: (index) => context.go(_tabs[index]),

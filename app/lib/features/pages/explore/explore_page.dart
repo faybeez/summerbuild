@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../../app_colors.dart';
 import '../../../classes.dart';
 
-import '../home/article_page.dart';
+import 'article_page.dart';
 
 class ExplorePage extends StatelessWidget {
   const ExplorePage({super.key});

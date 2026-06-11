@@ -4,7 +4,6 @@ enum StyleExperienceLevel { beginner, emerging, confident, advanced }
 
 class StyleQuizState {
   StyleExperienceLevel? experience;
-  String? experienceDetail;
   Set<String> vibeTags;
   String? colorGroup;
   String? fitPreference;
@@ -13,7 +12,6 @@ class StyleQuizState {
 
   StyleQuizState({
     this.experience,
-    this.experienceDetail,
     Set<String>? vibeTags,
     this.colorGroup,
     this.fitPreference,

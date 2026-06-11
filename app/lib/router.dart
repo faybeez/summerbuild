@@ -10,9 +10,9 @@ import 'features/pages/style_quiz/style_quiz_page.dart';
 import 'features/pages/wardrobe/wardrobe_page.dart';
 import 'features/pages/wardrobe/wardrobe_detail_page.dart';
 import 'features/pages/calendar/calendar_page.dart';
-import 'features/pages/home_page.dart';
-import '../../features/pages/explore_page.dart';
-import '../../features/pages/account_page.dart';
+import 'features/pages/home/home_page.dart';
+import 'features/pages/explore/explore_page.dart';
+import 'features/pages/account/account_page.dart';
 
 import '../../features/pages/main_shell.dart';
 

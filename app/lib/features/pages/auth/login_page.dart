@@ -7,10 +7,10 @@ import '../../../supabase_config.dart';
 import '../../widgets/inputs.dart';
 
 import '../wardrobe/wardrobe_page.dart';
-import '../home_page.dart';
+import '../home/home_page.dart';
 import '../calendar/calendar_page.dart';
-import '../explore_page.dart';
-import '../account_page.dart';
+import '../explore/explore_page.dart';
+import '../account/account_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
