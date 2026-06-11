@@ -60,7 +60,6 @@ export default {
         .map((tag) => tag.tag_name) || [];
 
     const prompt = `Analyze the clothing item in the image.
-                      Return only a valid minified JSON object.
                       Do not include markdown, explanations, comments, duplicate keys, or extra fields.
                       Use this exact schema:
                       {"main_colors":[],"secondary_colors":[],"occasion":[],"weather":[],"category":""}
@@ -128,9 +127,10 @@ export default {
 
     const rekaResponse = await response.json();
 
-    const payload = rekaResponse.choices[0].message.content;
+    const payload = JSON.parse(rekaResponse.choices[0].message.content);
 
     console.log("Reka response:", payload);
+    console.log("Reka response type:", typeof payload);
 
     return Response.json({ message: payload }, { status: 200 });
   }),
