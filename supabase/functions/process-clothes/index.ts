@@ -6,9 +6,9 @@ const REKA_API_KEY = Deno.env.get("REKA_API_KEY")!;
 
 interface ClothingTag {
   id: number;
-  tagType: string;
-  tagValue: string;
-  tagDisplayName: string;
+  tag_type: string;
+  tag_value: string;
+  tag_display_name: string;
 }
 
 export default {
@@ -177,9 +177,9 @@ export default {
       if (!tag) return null;
       return {
         id: tag.id,
-        tagType: tag.tag_type,
-        tagValue: tag.tag_value,
-        tagDisplayName: tag.tag_display_name,
+        tag_type: tag.tag_type,
+        tag_value: tag.tag_value,
+        tag_display_name: tag.tag_display_name,
       };
     };
 

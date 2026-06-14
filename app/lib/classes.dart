@@ -18,11 +18,11 @@ class ClothingTag {
   factory ClothingTag.fromJson(Map<String, dynamic> json) {
     return ClothingTag(
       id: (json['id'] as num).toInt(),
-      tagType: (json['tagType'] as String?) ?? '',
-      tagValue: (json['tagValue'] as String?) ?? '',
+      tagType: (json['tag_type'] as String?) ?? '',
+      tagValue: (json['tag_value'] as String?) ?? '',
       tagDisplayName:
-          (json['tagDisplayName'] as String?) ??
-          (json['tagValue'] as String?) ??
+          (json['tag_display_name'] as String?) ??
+          (json['tag_value'] as String?) ??
           '',
     );
   }
