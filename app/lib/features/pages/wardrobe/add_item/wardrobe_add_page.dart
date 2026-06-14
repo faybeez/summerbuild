@@ -22,22 +22,14 @@ class WardrobeAddPage extends StatefulWidget {
 
 class _WardrobeAddPageState extends State<WardrobeAddPage> {
   final _pageController = PageController();
-  final _state = WardrobeAddState();
+  late final WardrobeAddState _state;
   bool _isProcessing = false;
-
-  late final Future<List<ClothingTag>> _categoryTagsFuture;
-  late final Future<List<ClothingTag>> _colorTagsFuture;
-  late final Future<List<ClothingTag>> _occasionTagsFuture;
-  late final Future<List<ClothingTag>> _weatherTagsFuture;
 
   @override
   void initState() {
     super.initState();
 
-    _categoryTagsFuture = widget.tagsRepository.getTags(type: 'CATEGORY');
-    _colorTagsFuture = widget.tagsRepository.getTags(type: 'COLOR');
-    _occasionTagsFuture = widget.tagsRepository.getTags(type: 'OCCASION');
-    _weatherTagsFuture = widget.tagsRepository.getTags(type: 'WEATHER');
+    _state = WardrobeAddState(tagsRepository: widget.tagsRepository);
   }
 
   void _nextPage() {
@@ -79,21 +71,83 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
       );
 
       if (response.data != null) {
-        debugPrint('Raw Edge Function Data: ${response.data['message']}');
-        final json = response.data['message'] as Map<String, dynamic>;
-        setState(() => _state.applyFromEdgeFunction(json));
+        _state.applyFromEdgeFunction(response.data as Map<String, dynamic>);
+        if (mounted) setState(() {});
         _nextPage();
       }
     } on FunctionException catch (e) {
-      debugPrint('Edge Function Error: ${e}, Details: ${e.details}');
+      debugPrint('Edge Function Error: \$e, Details: \${e.details}');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to process image: ${e.details}'),
+            content: Text('Failed to process image: \${e.details}'),
             backgroundColor: AppColors.error,
           ),
         );
         _nextPage();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Something went wrong: \$e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
+
+  Future<void> _saveToSupabase() async {
+    if (_state.image == null || _state.category == null) return;
+
+    setState(() => _isProcessing = true);
+
+    try {
+      final imageFile = _state.image!;
+      final imageBytes = await imageFile.readAsBytes();
+      final fileName = imageFile.path.split('/').last;
+
+      final tagIds = [
+        ..._state.mainColors.map((t) => t.id),
+        ..._state.secondaryColors.map((t) => t.id),
+        ..._state.occasion.map((t) => t.id),
+        ..._state.weather.map((t) => t.id),
+        if (_state.category != null) _state.category!.id,
+      ];
+
+      final multipartRequest = http.MultipartRequest('POST', Uri());
+      multipartRequest.files.add(
+        http.MultipartFile.fromBytes('image', imageBytes, filename: fileName),
+      );
+      multipartRequest.fields['cost'] = _state.cost.toString();
+      multipartRequest.fields['times_worn'] = _state.timesWorn.toString();
+      multipartRequest.fields['tag_ids'] = '[${tagIds.join(',')}]';
+
+      final finalizedRequest = await multipartRequest.finalize().toBytes();
+      final contentType =
+          'multipart/form-data; boundary=${multipartRequest.headers['content-type']?.split('boundary=').last}';
+
+      final response = await Supabase.instance.client.functions.invoke(
+        'insert-clothes',
+        body: finalizedRequest,
+        headers: {'Content-Type': contentType},
+      );
+
+      if (response.data != null) {
+        if (mounted) context.go('/wardrobe');
+      }
+    } on FunctionException catch (e) {
+      debugPrint('Edge Function Error: $e, Details: ${e.details}');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to save: ${e.details}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -107,11 +161,6 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
     } finally {
       if (mounted) setState(() => _isProcessing = false);
     }
-  }
-
-  Future<void> _saveToSupabase() async {
-    // TODO: save _state to Supabase
-    if (mounted) context.go('/wardrobe');
   }
 
   @override
@@ -142,8 +191,16 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
         controller: _pageController,
         physics: const NeverScrollableScrollPhysics(),
         children: [
-          WardrobeUploadPage(state: _state, onContinue: _processAndContinue),
-          WardrobeReviewPage(state: _state, onConfirm: _saveToSupabase),
+          WardrobeUploadPage(
+            state: _state,
+            onContinue: _processAndContinue,
+            isLoading: _isProcessing,
+          ),
+          WardrobeReviewPage(
+            state: _state,
+            onConfirm: _saveToSupabase,
+            isLoading: _isProcessing,
+          ),
         ],
       ),
     );

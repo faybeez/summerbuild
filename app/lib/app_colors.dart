@@ -9,6 +9,8 @@ class AppColors {
   static const appTerracotta = Color(0xFFA65F46);
   static const appOlive = Color(0xFF8C7E5B);
   static const appEspresso = Color(0xFF2A1814);
+  static const appChipBg = Color(0xFFFDE8CA);
+  static const appHandleBar = Color(0xFFE8D0B0);
 
   static const background = appCream;
   static const backgroundAlt = appWarmCream;

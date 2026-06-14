@@ -8,11 +8,13 @@ import 'wardrobe_add_state.dart';
 class WardrobeUploadPage extends StatefulWidget {
   final WardrobeAddState state;
   final VoidCallback onContinue;
+  final bool isLoading;
 
   const WardrobeUploadPage({
     super.key,
     required this.state,
     required this.onContinue,
+    this.isLoading = false,
   });
 
   @override
@@ -37,6 +39,7 @@ class _WardrobeUploadPageState extends State<WardrobeUploadPage> {
   @override
   Widget build(BuildContext context) {
     final image = widget.state.image;
+    final isLoading = widget.isLoading;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -69,7 +72,7 @@ class _WardrobeUploadPageState extends State<WardrobeUploadPage> {
 
               Expanded(
                 child: GestureDetector(
-                  onTap: _pickImage,
+                  onTap: isLoading ? null : _pickImage,
                   child: image != null
                       ? Container(
                           width: double.infinity,
@@ -127,8 +130,9 @@ class _WardrobeUploadPageState extends State<WardrobeUploadPage> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  // Disabled if no image selected, active otherwise
-                  onPressed: image != null ? widget.onContinue : null,
+                  onPressed: (image != null && !isLoading)
+                      ? widget.onContinue
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.appEspresso,
                     disabledBackgroundColor: AppColors.appEspresso.withAlpha(
@@ -139,16 +143,26 @@ class _WardrobeUploadPageState extends State<WardrobeUploadPage> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
+
               const SizedBox(height: 16),
             ],
           ),
@@ -158,7 +172,6 @@ class _WardrobeUploadPageState extends State<WardrobeUploadPage> {
   }
 }
 
-// Extracted as a const widget for performance
 class _UploadIcon extends StatelessWidget {
   const _UploadIcon();
 
@@ -180,7 +193,6 @@ class _UploadIcon extends StatelessWidget {
   }
 }
 
-// Keep DashedBorderPainter here or move it to a shared painters.dart file
 class DashedBorderPainter extends CustomPainter {
   final Color color;
 

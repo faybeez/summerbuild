@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/material.dart';
 
 import '../../classes.dart';
 
@@ -22,23 +23,33 @@ class TagsRepository {
     bool forceRefresh = false,
     String type = 'ALL',
   }) async {
-    final normalizedType = type.trim().toUpperCase();
-
-    if (!_allowedTagTypes.contains(normalizedType)) {
-      throw ArgumentError(
-        'Invalid tag type: $type. Allowed values are: ${_allowedTagTypes.join(', ')}',
+    try {
+      debugPrint(
+        'Requesting tags with type: $type, forceRefresh: $forceRefresh',
       );
+      final normalizedType = type.trim().toUpperCase();
+
+      if (!_allowedTagTypes.contains(normalizedType)) {
+        throw ArgumentError(
+          'Invalid tag type: $type. Allowed values are: ${_allowedTagTypes.join(', ')}',
+        );
+      }
+
+      final tags = await _getAllTags(forceRefresh: forceRefresh);
+
+      if (normalizedType == 'ALL') {
+        return tags;
+      }
+
+      final response = tags
+          .where((tag) => tag.tagType.toUpperCase() == normalizedType)
+          .toList();
+
+      return response;
+    } catch (e) {
+      debugPrint('Error fetching tags: $e');
+      return [];
     }
-
-    final tags = await _getAllTags(forceRefresh: forceRefresh);
-
-    if (normalizedType == 'ALL') {
-      return tags;
-    }
-
-    return tags.where((tag) {
-      return tag.tagType.trim().toUpperCase() == normalizedType;
-    }).toList();
   }
 
   Future<List<ClothingTag>> _getAllTags({bool forceRefresh = false}) async {
@@ -62,18 +73,26 @@ class TagsRepository {
   }
 
   Future<List<ClothingTag>> _fetchTags() async {
-    final response = await _supabase
-        .from('tags')
-        .select('id, tag_type, tag_value, tag_display_name')
-        .or(
-          'created_by.eq.${_supabase.auth.currentUser!.id},created_by.is.null',
-        )
-        .order('tag_type')
-        .order('tag_display_name');
+    try {
+      final response = await _supabase
+          .from('tags')
+          .select('id, tag_type, tag_value, tag_display_name')
+          .or(
+            'created_by.eq.${_supabase.auth.currentUser!.id},created_by.is.null',
+          )
+          .order('tag_type')
+          .order('tag_display_name');
 
-    return (response as List)
-        .map((json) => ClothingTag.fromJson(json as Map<String, dynamic>))
-        .toList();
+      print('Tags response: $response');
+      print('Count: ${(response as List).length}');
+
+      return (response as List)
+          .map((json) => ClothingTag.fromJson(json as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      debugPrint('Error fetching tags from Supabase: $e');
+      return [];
+    }
   }
 
   void clearCache() {

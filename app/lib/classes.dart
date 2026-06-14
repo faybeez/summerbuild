@@ -17,11 +17,19 @@ class ClothingTag {
 
   factory ClothingTag.fromJson(Map<String, dynamic> json) {
     return ClothingTag(
-      id: json['id'] as int,
-      tagType: json['tag_type'] as String,
-      tagValue: json['tag_value'] as String,
-      tagDisplayName: json['tag_display_name'] as String,
+      id: (json['id'] as num).toInt(),
+      tagType: (json['tagType'] as String?) ?? '',
+      tagValue: (json['tagValue'] as String?) ?? '',
+      tagDisplayName:
+          (json['tagDisplayName'] as String?) ??
+          (json['tagValue'] as String?) ??
+          '',
     );
+  }
+
+  @override
+  String toString() {
+    return 'ClothingTag(id: $id, tagType: $tagType, tagValue: $tagValue, tagDisplayName: $tagDisplayName)';
   }
 }
 

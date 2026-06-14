@@ -3,7 +3,13 @@ import { withSupabase } from "@supabase/server";
 import type { Database } from "../database.types.ts";
 
 const REKA_API_KEY = Deno.env.get("REKA_API_KEY")!;
-console.log("REKA_API_KEY:", REKA_API_KEY);
+
+interface ClothingTag {
+  id: number;
+  tagType: string;
+  tagValue: string;
+  tagDisplayName: string;
+}
 
 export default {
   fetch: withSupabase<Database>({ auth: "user" }, async (req, ctx) => {
@@ -33,31 +39,40 @@ export default {
     }
 
     const base64 = btoa(binary);
-
     const mimeType = image.type || "image/jpeg";
     const dataUrl = `data:${mimeType};base64,${base64}`;
 
-    const allTags = await supabase
+    const allTagsResult = await supabase
       .from("tags")
       .select("*")
       .or(`created_by.eq.${userClaims.id},created_by.is.null`);
 
+    const allTags = allTagsResult.data ?? [];
+
+    const findTag = (type: string, name: string) =>
+      allTags.find(
+        (t) =>
+          t.tag_type.toUpperCase() === type.toUpperCase() &&
+          (t.tag_value === name.toUpperCase() ||
+            t.tag_display_name.toUpperCase() === name.toUpperCase()),
+      );
+
     const colors =
       allTags
-        .data!.filter((tag) => tag.tag_type.toUpperCase() === "COLORS")
-        .map((tag) => tag.tag_name) || [];
+        .filter((t) => t.tag_type.toUpperCase() === "COLOR")
+        .map((t) => t.tag_value) ?? [];
     const occasion =
       allTags
-        .data!.filter((tag) => tag.tag_type.toUpperCase() === "OCCASION")
-        .map((tag) => tag.tag_name) || [];
+        .filter((t) => t.tag_type.toUpperCase() === "OCCASION")
+        .map((t) => t.tag_value) ?? [];
     const weather =
       allTags
-        .data!.filter((tag) => tag.tag_type.toUpperCase() === "WEATHER FIT")
-        .map((tag) => tag.tag_name) || [];
+        .filter((t) => t.tag_type.toUpperCase() === "WEATHER")
+        .map((t) => t.tag_value) ?? [];
     const categories =
       allTags
-        .data!.filter((tag) => tag.tag_type.toUpperCase() === "CLOTHES TYPE")
-        .map((tag) => tag.tag_name) || [];
+        .filter((t) => t.tag_type.toUpperCase() === "CATEGORY")
+        .map((t) => t.tag_value) ?? [];
 
     const prompt = `Analyze the clothing item in the image.
                       Do not include markdown, explanations, comments, duplicate keys, or extra fields.
@@ -95,7 +110,7 @@ export default {
                       * Always return all fields.
 
                       Output example:
-                      {"main_colors":["Black"],"secondary_colors":["White"],"occasion":["Casual"],"weather":["Cold Weather"],"category":"Tops"}`;
+                      {"main_colors":["BLACK"],"secondary_colors":["WHITE"],"occasion":["CASUAL"],"weather":["COLD"],"category":"TOPS"}`;
 
     const response = await fetch("https://api.reka.ai/v1/chat/completions", {
       method: "POST",
@@ -111,9 +126,7 @@ export default {
             content: [
               {
                 type: "image_url",
-                image_url: {
-                  url: dataUrl,
-                },
+                image_url: { url: dataUrl },
               },
               {
                 type: "text",
@@ -126,12 +139,79 @@ export default {
     });
 
     const rekaResponse = await response.json();
-
     const payload = JSON.parse(rekaResponse.choices[0].message.content);
 
     console.log("Reka response:", payload);
-    console.log("Reka response type:", typeof payload);
 
-    return Response.json({ message: payload }, { status: 200 });
+    const validatedMainColors: string[] = (payload.main_colors ?? []).filter(
+      (name: string) => findTag("COLOR", name) !== undefined,
+    );
+
+    const validatedSecondaryColors: string[] = (
+      payload.secondary_colors ?? []
+    ).filter((name: string) => findTag("COLOR", name) !== undefined);
+
+    const validatedOccasion: string[] = (payload.occasion ?? []).filter(
+      (name: string) => findTag("OCCASION", name) !== undefined,
+    );
+
+    const validatedWeather: string[] = (payload.weather ?? []).filter(
+      (name: string) => findTag("WEATHER", name) !== undefined,
+    );
+
+    const categoryTag =
+      typeof payload.category === "string"
+        ? findTag("CATEGORY", payload.category)
+        : undefined;
+
+    console.log("Validated payload:", {
+      validatedMainColors,
+      validatedSecondaryColors,
+      validatedOccasion,
+      validatedWeather,
+      category: categoryTag?.tag_value ?? null,
+    });
+
+    const toClothingTag = (type: string, name: string): ClothingTag | null => {
+      const tag = findTag(type, name);
+      if (!tag) return null;
+      return {
+        id: tag.id,
+        tagType: tag.tag_type,
+        tagValue: tag.tag_value,
+        tagDisplayName: tag.tag_display_name,
+      };
+    };
+
+    const mainColors = validatedMainColors
+      .map((n) => toClothingTag("COLOR", n))
+      .filter((t): t is ClothingTag => t !== null);
+
+    const secondaryColors = validatedSecondaryColors
+      .map((n) => toClothingTag("COLOR", n))
+      .filter((t): t is ClothingTag => t !== null);
+
+    const occasionTags = validatedOccasion
+      .map((n) => toClothingTag("OCCASION", n))
+      .filter((t): t is ClothingTag => t !== null);
+
+    const weatherTags = validatedWeather
+      .map((n) => toClothingTag("WEATHER", n))
+      .filter((t): t is ClothingTag => t !== null);
+
+    const category = categoryTag
+      ? toClothingTag("CATEGORY", categoryTag.tag_value)
+      : null;
+
+    return Response.json(
+      {
+        mainColors,
+        secondaryColors,
+        occasion: occasionTags,
+        weather: weatherTags,
+        category,
+      },
+      { status: 200 },
+    );
   }),
 };

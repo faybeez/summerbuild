@@ -76,6 +76,7 @@ class _WardrobePageState extends State<WardrobePage> {
   @override
   void initState() {
     super.initState();
+    debugPrint('Fetching category tags...');
     _categoryTagsFuture = widget.tagsRepository.getTags(type: 'CATEGORY');
   }
 
@@ -100,7 +101,15 @@ class _WardrobePageState extends State<WardrobePage> {
               ),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return const CircularProgressIndicator();
+                  return const SizedBox(
+                    height: 40,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.appEspresso,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  );
                 }
 
                 final categories = snapshot.data!;
@@ -109,14 +118,14 @@ class _WardrobePageState extends State<WardrobePage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: categories.map((category) {
+                      final isSelected = _selectedCategory == category;
                       return Padding(
                         padding: const EdgeInsets.only(right: 8.0),
                         child: FilterChip(
                           label: Text(category),
-                          selected: _selectedCategory == category,
-                          onSelected: (_) {
-                            setState(() => _selectedCategory = category);
-                          },
+                          selected: isSelected,
+                          onSelected: (_) =>
+                              setState(() => _selectedCategory = category),
                         ),
                       );
                     }).toList(),

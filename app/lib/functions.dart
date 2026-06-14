@@ -33,7 +33,7 @@ Future<List<String>> getWeatherTypes() async {
   final data = await Supabase.instance.client
       .from('tags')
       .select('tag_name')
-      .eq('tag_type', 'Weather Fit');
+      .eq('tag_type', 'Weather');
 
   final categories = (data as List)
       .map((item) => item['tag_name'] as String)
