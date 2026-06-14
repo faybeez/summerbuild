@@ -11,6 +11,13 @@ COMMENT ON TABLE public.clothes_tags IS 'relationship between clothes and tags';
 
 ALTER TABLE public.clothes_tags ENABLE ROW LEVEL SECURITY;
 
+-- Index
+
+create index idx_clothes_tags_clothes_id
+  on public.clothes_tags(clothes_id);
+
+-- Policies
+
 DROP POLICY IF EXISTS clothes_tags_crud_own_data ON public.clothes_tags;
 
 CREATE POLICY clothes_tags_crud_own_data

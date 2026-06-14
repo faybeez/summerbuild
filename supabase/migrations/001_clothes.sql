@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS public.clothes (
     cost real,
     times_worn integer DEFAULT 0 NOT NULL,
     is_favorite boolean DEFAULT false NOT NULL,
+    image_type text NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     edited_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -11,6 +12,10 @@ CREATE TABLE IF NOT EXISTS public.clothes (
 ALTER TABLE public.clothes OWNER TO postgres;
 
 COMMENT ON TABLE public.clothes IS 'main clothes table';
+
+-- Index
+create index idx_wardrobe_item_created_at
+  on public.clothes(user_id, created_at desc);
 
 -- Policies
 

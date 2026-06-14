@@ -32,12 +32,14 @@ export default {
 
     try {
       const user_id = userClaims.id;
+      const image_type = image.type.split("/")[1] || "png";
 
       // insert main clothes item
       const clothesInsert: ClothesInsert = {
         cost: cost,
         times_worn: times_worn,
         user_id: user_id,
+        image_type: image_type,
       };
 
       const { data: clothes, error: clothesError } = await supabase
@@ -55,10 +57,10 @@ export default {
       const clothes_id = clothes[0].id;
 
       // insert photos to bucket
-      const { data: imageData, error: imageError } = await supabase.storage
+      const { data: _, error: imageError } = await supabase.storage
         .from("clothes_photos")
-        .upload(`${user_id}/${clothes_id}.png`, image, {
-          // contentType: image.type,
+        .upload(`${user_id}/${clothes_id}.${image_type}`, image, {
+          contentType: image.type,
           upsert: true, // overwrite existing files
         });
 
@@ -80,7 +82,7 @@ export default {
       console.log("Inserting tags:", tags);
 
       if (tags.length > 0) {
-        const { data: tagsData, error: tagsError } = await supabase
+        const { data: _, error: tagsError } = await supabase
           .from("clothes_tags")
           .insert(tags);
 
