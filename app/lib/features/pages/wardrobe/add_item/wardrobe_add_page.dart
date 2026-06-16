@@ -109,6 +109,7 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
       final imageFile = _state.image!;
       final imageBytes = await imageFile.readAsBytes();
       final fileName = imageFile.path.split('/').last;
+      final type = fileName.split('.').last;
 
       final tagIds = [
         ..._state.mainColors.map((t) => t.id),
@@ -120,7 +121,12 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
 
       final multipartRequest = http.MultipartRequest('POST', Uri());
       multipartRequest.files.add(
-        http.MultipartFile.fromBytes('image', imageBytes, filename: fileName),
+        http.MultipartFile.fromBytes(
+          'image',
+          imageBytes,
+          filename: fileName,
+          contentType: http.MediaType('image', type),
+        ),
       );
       multipartRequest.fields['cost'] = _state.cost.toString();
       multipartRequest.fields['times_worn'] = _state.timesWorn.toString();

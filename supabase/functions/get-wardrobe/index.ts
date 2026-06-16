@@ -1,4 +1,3 @@
-// supabase/functions/get-wardrobe/index.ts
 import "@supabase/functions-js/edge-runtime.d.ts";
 import { withSupabase } from "@supabase/server";
 import type { Database } from "../database.types.ts";
@@ -40,10 +39,16 @@ export default {
       .select("clothes_id, tags(*)")
       .in("clothes_id", itemIds);
 
+    if (tagsError) {
+      return Response.json({ error: tagsError.message }, { status: 500 });
+    }
+
     const paths = items.map((i) => `${userClaims.id}/${i.id}.${i.image_type}`);
     const { data: signedUrls } = await supabase.storage
-      .from("wardrobe-images")
+      .from("clothes_photos")
       .createSignedUrls(paths, 3600);
+
+    console.log("Signed URLs:", signedUrls);
 
     const urlMap = Object.fromEntries(
       (signedUrls ?? [])
@@ -51,6 +56,7 @@ export default {
         .map((s) => [s.path, s.signedUrl]),
     );
 
+    console.log("URL Map:", urlMap);
     const result = items.map((item) => ({
       id: item.id,
       imageUrl:
@@ -58,7 +64,10 @@ export default {
       cost: item.cost,
       timesWorn: item.times_worn,
       createdAt: item.created_at,
-      tags: tagsData!.find((x) => x.clothes_id === item.id)?.tags ?? [],
+      tags:
+        tagsData!
+          .filter((x) => x.clothes_id === item.id)
+          .flatMap((x) => x.tags) ?? [],
     }));
 
     return Response.json(
