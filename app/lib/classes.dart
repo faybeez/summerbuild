@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'app_colors.dart';
 import 'functions.dart';
 
@@ -133,10 +134,43 @@ class DashedBorderPainter extends CustomPainter {
 }
 
 class ForecastCard extends StatelessWidget {
-  const ForecastCard({super.key});
+  final String? forecast;
+  final double? temperature;
+  final double? humidity;
+
+  const ForecastCard({
+    super.key,
+    this.forecast,
+    this.temperature,
+    this.humidity,
+  });
+
+  IconData _forecastIcon(String forecast) {
+    final f = forecast.toLowerCase();
+    if (f.contains('thunder') || f.contains('storm'))
+      return Symbols.thunderstorm;
+    if (f.contains('heavy rain') || f.contains('heavy showers'))
+      return Symbols.thunderstorm;
+    if (f.contains('rain') || f.contains('showers') || f.contains('drizzle'))
+      return Symbols.rainy;
+    if (f.contains('cloudy') || f.contains('overcast')) return Symbols.cloudy;
+    if (f.contains('partly cloudy') || f.contains('fair & warm'))
+      return Symbols.partly_cloudy_day;
+    if (f.contains('fair') || f.contains('sunny') || f.contains('clear'))
+      return Symbols.sunny;
+    if (f.contains('windy') ||
+        f.contains('hazy') ||
+        f.contains('mist') ||
+        f.contains('fog'))
+      return Symbols.air;
+    return Symbols.cloudy;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = forecast == null && temperature == null;
+    final hasError = forecast == null && temperature == null;
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: cardDecoration(AppColors.appWarmCream),
@@ -149,33 +183,57 @@ class ForecastCard extends StatelessWidget {
               color: AppColors.appCard,
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(
-              Icons.cloud_queue,
-              color: AppColors.appTerracotta,
-              size: 38,
-            ),
+            child: isLoading
+                ? const Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.appTerracotta,
+                      ),
+                    ),
+                  )
+                : Icon(
+                    _forecastIcon(forecast ?? ''),
+                    color: AppColors.appTerracotta,
+                    size: 38,
+                  ),
           ),
           const SizedBox(width: 16),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '31 C / Cloudy',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.appEspresso,
-                    fontWeight: FontWeight.w800,
+            child: isLoading
+                ? Text(
+                    'Loading weather...',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: AppColors.appEspresso.withOpacity(0.4),
+                      fontWeight: FontWeight.w800,
+                    ),
+                  )
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        temperature != null
+                            ? '${temperature!.toStringAsFixed(0)}°C / $forecast'
+                            : forecast ?? '—',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppColors.appEspresso,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      if (humidity != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'Humidity: $humidity%',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: AppColors.appEspresso.withOpacity(0.5),
+                              ),
+                        ),
+                      ],
+                    ],
                   ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'Choose breathable layers and shoes that can handle a quick shower.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.appEspresso.withAlpha(170),
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),

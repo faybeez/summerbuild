@@ -1,23 +1,53 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 import '../../../app_colors.dart';
 import '../../../classes.dart';
+import '../../services/weather_service.dart';
 
 import 'outfit_detail_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  Map<String, dynamic>? weather;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchWeather();
+  }
+
+  Future<void> _fetchWeather() async {
+    try {
+      final result = await WeatherService().fetchWeather();
+      setState(() {
+        weather = result;
+      });
+    } catch (e) {
+      setState(() {
+        weather = {'error': true};
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AppPage(
       title: 'Today',
-      subtitle: 'Warm afternoon, light breeze',
+      subtitle: weather?['area'] ?? 'Loading area...',
       children: [
-        const ForecastCard(),
+        ForecastCard(
+          forecast: weather?['forecast'],
+          temperature: weather?['temperature'],
+          humidity: weather?['humidity'],
+        ),
         SectionHeader(
           title: 'Recommended Outfits',
           actionLabel: 'Refresh',

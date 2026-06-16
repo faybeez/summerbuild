@@ -22,10 +22,10 @@ class WardrobeClothingItem {
   });
 
   factory WardrobeClothingItem.fromJson(Map<String, dynamic> json) {
-    debugPrint('Parsing WardrobeClothingItem from JSON: $json');
+    // debugPrint('Parsing WardrobeClothingItem from JSON: $json');
     final rawTags = json['tags'] as List<dynamic>? ?? [];
 
-    debugPrint('Raw tags data: $rawTags');
+    // debugPrint('Raw tags data: $rawTags');
     return WardrobeClothingItem(
       id: (json['id'] as num).toInt(),
       imageUrl: (json['imageUrl'] as String?),
@@ -90,23 +90,22 @@ class WardrobeRepository {
     }
 
     final json = response.data as Map<String, dynamic>;
-    debugPrint('get-wardrobe response: $json');
-    debugPrint('get-wardrobe items: ${json["items"].runtimeType}');
+    // debugPrint('get-wardrobe response: $json');
+    // debugPrint('get-wardrobe items: ${json["items"].runtimeType}');
 
     final rawItems = json['items'] as List<dynamic>? ?? [];
 
-    debugPrint('get-wardrobe raw items count: ${rawItems.length}');
-
-    if (rawItems.isNotEmpty) {
-      debugPrint('first item type: ${rawItems.first.runtimeType}');
-      debugPrint('first item value: ${rawItems.first}');
-    }
+    // debugPrint('get-wardrobe raw items count: ${rawItems.length}');\
+    // if (rawItems.isNotEmpty) {
+    // debugPrint('first item type: ${rawItems.first.runtimeType}');
+    // debugPrint('first item value: ${rawItems.first}');
+    // }
 
     final items = rawItems.map(
       (i) => WardrobeClothingItem.fromJson(i as Map<String, dynamic>),
     );
 
-    debugPrint('Items: ${items}');
+    // debugPrint('Items: ${items}');
 
     return WardrobePage(
       items: items.toList(),
