@@ -37,8 +37,8 @@ class WardrobeClothingItem {
         return ClothingTag(
           id: (map['id'] as num).toInt(),
           tagType: (map['tag_type'] as String?) ?? '',
-          tagValue: (map['tag_name'] as String?) ?? '',
-          tagDisplayName: (map['tag_name'] as String?) ?? '',
+          tagValue: (map['tag_value'] as String?) ?? '',
+          tagDisplayName: (map['tag_display_name'] as String?) ?? '',
         );
       }).toList(),
     );
