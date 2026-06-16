@@ -10,6 +10,14 @@ import '../../data/tags_repository.dart';
 import '../../data/wardrobe_repository.dart';
 import 'wardrobe_detail_page.dart';
 
+String _filterKey(ClothingTag tag) {
+  final t = tag.tagType.toUpperCase();
+  if (t == 'COLOR' || t == 'MAIN_COLOR' || t == 'SECONDARY_COLOR') {
+    return 'color:${tag.tagValue.trim().toLowerCase()}';
+  }
+  return 'id:${tag.id}';
+}
+
 class WardrobePage extends StatefulWidget {
   const WardrobePage({super.key, required this.tagsRepository});
 
@@ -29,17 +37,17 @@ class _WardrobePageState extends State<WardrobePage> {
   bool _hasMore = true;
   String? _cursor;
 
-  final Set<int> _selectedTagIds = {};
+  final Map<String, ClothingTag> _selectedFilters = {};
 
   List<WardrobeClothingItem> get _filteredItems {
-    if (_selectedTagIds.isEmpty) return _items;
+    if (_selectedFilters.isEmpty) return _items;
     return _items.where((item) {
-      final itemTagIds = item.tags.map((t) => t.id).toSet();
-      return _selectedTagIds.every((id) => itemTagIds.contains(id));
+      final itemKeys = item.tags.map(_filterKey).toSet();
+      return _selectedFilters.keys.every((key) => itemKeys.contains(key));
     }).toList();
   }
 
-  bool get _hasActiveFilters => _selectedTagIds.isNotEmpty;
+  bool get _hasActiveFilters => _selectedFilters.isNotEmpty;
 
   @override
   void initState() {
@@ -48,6 +56,13 @@ class _WardrobePageState extends State<WardrobePage> {
     _allTagsFuture = _loadAllTags();
     _scrollController = ScrollController()..addListener(_onScroll);
     _fetchNextPage();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final justSaved = GoRouterState.of(context).extra as bool? ?? false;
+    if (justSaved) _refresh();
   }
 
   Future<Map<String, List<ClothingTag>>> _loadAllTags() async {
@@ -74,15 +89,12 @@ class _WardrobePageState extends State<WardrobePage> {
   void _onScroll() {
     final max = _scrollController.position.maxScrollExtent;
     final pos = _scrollController.position.pixels;
-    if (pos >= max - 500 && !_isLoading && _hasMore) {
-      _fetchNextPage();
-    }
+    if (pos >= max - 500 && !_isLoading && _hasMore) _fetchNextPage();
   }
 
   Future<void> _fetchNextPage() async {
     if (_isLoading) return;
     setState(() => _isLoading = true);
-
     try {
       final page = await _wardrobeRepo.fetchPage(cursor: _cursor);
       setState(() {
@@ -109,7 +121,7 @@ class _WardrobePageState extends State<WardrobePage> {
   }
 
   void _openFilterSheet(Map<String, List<ClothingTag>> allTags) {
-    final pending = Set<int>.from(_selectedTagIds);
+    final pending = Map<String, ClothingTag>.from(_selectedFilters);
 
     showModalBottomSheet(
       context: context,
@@ -140,9 +152,8 @@ class _WardrobePageState extends State<WardrobePage> {
                           ),
                           const Spacer(),
                           TextButton(
-                            onPressed: () {
-                              setSheetState(() => pending.clear());
-                            },
+                            onPressed: () =>
+                                setSheetState(() => pending.clear()),
                             child: Text(
                               'Clear all',
                               style: TextStyle(
@@ -157,7 +168,7 @@ class _WardrobePageState extends State<WardrobePage> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _selectedTagIds
+                                _selectedFilters
                                   ..clear()
                                   ..addAll(pending);
                               });
@@ -195,16 +206,17 @@ class _WardrobePageState extends State<WardrobePage> {
                                 spacing: 8,
                                 runSpacing: 8,
                                 children: groupTags.map((tag) {
-                                  final selected = pending.contains(tag.id);
+                                  final key = _filterKey(tag);
+                                  final selected = pending.containsKey(key);
                                   return FilterChip(
                                     label: Text(tag.tagDisplayName),
                                     selected: selected,
                                     onSelected: (_) {
                                       setSheetState(() {
                                         if (selected) {
-                                          pending.remove(tag.id);
+                                          pending.remove(key);
                                         } else {
-                                          pending.add(tag.id);
+                                          pending[key] = tag;
                                         }
                                       });
                                     },
@@ -266,7 +278,7 @@ class _WardrobePageState extends State<WardrobePage> {
                 ],
               ),
               IconButton.filledTonal(
-                onPressed: () => context.go('/wardrobe/add'),
+                onPressed: () => context.push('/wardrobe/add'),
                 icon: const Icon(Icons.add),
               ),
             ],
@@ -279,25 +291,22 @@ class _WardrobePageState extends State<WardrobePage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      ..._selectedTagIds.map((id) {
-                        final tag = allTags.values
-                            .expand((list) => list)
-                            .where((t) => t.id == id)
-                            .firstOrNull;
-                        if (tag == null) return const SizedBox.shrink();
+                      ..._selectedFilters.entries.map((entry) {
+                        final tag = entry.value;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8),
                           child: Chip(
                             label: Text(tag.tagDisplayName),
                             deleteIcon: const Icon(Icons.close, size: 16),
-                            onDeleted: () =>
-                                setState(() => _selectedTagIds.remove(id)),
+                            onDeleted: () => setState(
+                              () => _selectedFilters.remove(entry.key),
+                            ),
                           ),
                         );
                       }),
                       TextButton(
                         onPressed: () =>
-                            setState(() => _selectedTagIds.clear()),
+                            setState(() => _selectedFilters.clear()),
                         child: const Text('Clear all'),
                       ),
                     ],

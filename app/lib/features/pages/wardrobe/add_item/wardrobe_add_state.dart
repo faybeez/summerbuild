@@ -73,5 +73,14 @@ class WardrobeAddState {
         .toList();
   }
 
+  void reset() {
+    image = null;
+    mainColors = [];
+    secondaryColors = [];
+    occasion = [];
+    category = null;
+    weather = [];
+  }
+
   bool get isReadyToSave => image != null && category != null;
 }

@@ -100,3 +100,61 @@ WHERE NOT EXISTS (
     WHERE t.tag_type = new_tags.tag_type
       AND t.tag_value = new_tags.tag_value
 );
+
+-- Add Color values
+INSERT INTO public.tags (tag_type, tag_value, tag_display_name)
+SELECT tag_type, tag_value, tag_display_name
+FROM (
+    VALUES
+        ('MAIN_COLOR', 'BLACK', 'Black'),
+        ('MAIN_COLOR', 'WHITE', 'White'),
+        ('MAIN_COLOR', 'GRAY', 'Gray'),
+        ('MAIN_COLOR', 'RED', 'Red'),
+        ('MAIN_COLOR', 'BLUE', 'Blue'),
+        ('MAIN_COLOR', 'GREEN', 'Green'),
+        ('MAIN_COLOR', 'YELLOW', 'Yellow'),
+        ('MAIN_COLOR', 'ORANGE', 'Orange'),
+        ('MAIN_COLOR', 'PURPLE', 'Purple'),
+        ('MAIN_COLOR', 'PINK', 'Pink'),
+        ('MAIN_COLOR', 'BROWN', 'Brown'),
+        ('MAIN_COLOR', 'BEIGE', 'Beige'),
+        ('MAIN_COLOR', 'CREAM', 'Cream'),
+        ('MAIN_COLOR', 'NAVY', 'Navy'),
+        ('MAIN_COLOR', 'GOLD', 'Gold'),
+        ('MAIN_COLOR', 'SILVER', 'Silver')
+) AS new_tags(tag_type, tag_value, tag_display_name)
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM public.tags t
+    WHERE t.tag_type = new_tags.tag_type
+      AND t.tag_value = new_tags.tag_value
+);
+
+-- Add Color values
+INSERT INTO public.tags (tag_type, tag_value, tag_display_name)
+SELECT tag_type, tag_value, tag_display_name
+FROM (
+    VALUES
+        ('SECONDARY_COLOR', 'BLACK', 'Black'),
+        ('SECONDARY_COLOR', 'WHITE', 'White'),
+        ('SECONDARY_COLOR', 'GRAY', 'Gray'),
+        ('SECONDARY_COLOR', 'RED', 'Red'),
+        ('SECONDARY_COLOR', 'BLUE', 'Blue'),
+        ('SECONDARY_COLOR', 'GREEN', 'Green'),
+        ('SECONDARY_COLOR', 'YELLOW', 'Yellow'),
+        ('SECONDARY_COLOR', 'ORANGE', 'Orange'),
+        ('SECONDARY_COLOR', 'PURPLE', 'Purple'),
+        ('SECONDARY_COLOR', 'PINK', 'Pink'),
+        ('SECONDARY_COLOR', 'BROWN', 'Brown'),
+        ('SECONDARY_COLOR', 'BEIGE', 'Beige'),
+        ('SECONDARY_COLOR', 'CREAM', 'Cream'),
+        ('SECONDARY_COLOR', 'NAVY', 'Navy'),
+        ('SECONDARY_COLOR', 'GOLD', 'Gold'),
+        ('SECONDARY_COLOR', 'SILVER', 'Silver')
+) AS new_tags(tag_type, tag_value, tag_display_name)
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM public.tags t
+    WHERE t.tag_type = new_tags.tag_type
+      AND t.tag_value = new_tags.tag_value
+);

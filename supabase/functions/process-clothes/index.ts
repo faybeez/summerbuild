@@ -144,12 +144,12 @@ export default {
     console.log("Reka response:", payload);
 
     const validatedMainColors: string[] = (payload.main_colors ?? []).filter(
-      (name: string) => findTag("COLOR", name) !== undefined,
+      (name: string) => findTag("MAIN_COLOR", name) !== undefined,
     );
 
     const validatedSecondaryColors: string[] = (
       payload.secondary_colors ?? []
-    ).filter((name: string) => findTag("COLOR", name) !== undefined);
+    ).filter((name: string) => findTag("SECONDARY_COLOR", name) !== undefined);
 
     const validatedOccasion: string[] = (payload.occasion ?? []).filter(
       (name: string) => findTag("OCCASION", name) !== undefined,
@@ -184,11 +184,11 @@ export default {
     };
 
     const mainColors = validatedMainColors
-      .map((n) => toClothingTag("COLOR", n))
+      .map((n) => toClothingTag("MAIN_COLOR", n))
       .filter((t): t is ClothingTag => t !== null);
 
     const secondaryColors = validatedSecondaryColors
-      .map((n) => toClothingTag("COLOR", n))
+      .map((n) => toClothingTag("SECONDARY_COLOR", n))
       .filter((t): t is ClothingTag => t !== null);
 
     const occasionTags = validatedOccasion

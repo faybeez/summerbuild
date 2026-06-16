@@ -58,7 +58,7 @@ class WardrobeClothingItem {
   }
 
   ClothingTag? get category =>
-      tags.where((t) => t.tagType.toUpperCase() == 'CLOTHES TYPE').firstOrNull;
+      tags.where((t) => t.tagType.toUpperCase() == 'CATEGORY').firstOrNull;
 }
 
 class WardrobePage {

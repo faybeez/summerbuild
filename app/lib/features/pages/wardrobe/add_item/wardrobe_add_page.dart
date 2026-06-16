@@ -15,7 +15,6 @@ class WardrobeAddPage extends StatefulWidget {
   const WardrobeAddPage({super.key, required this.tagsRepository});
 
   final TagsRepository tagsRepository;
-
   @override
   State<WardrobeAddPage> createState() => _WardrobeAddPageState();
 }
@@ -78,12 +77,12 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
     } on FunctionException catch (e) {
       debugPrint('Edge Function Error: \$e, Details: \${e.details}');
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to process image: \${e.details}'),
-            backgroundColor: AppColors.error,
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Failed to process image: \${e.details}'),
+        //     backgroundColor: AppColors.error,
+        //   ),
+        // );
         _nextPage();
       }
     } catch (e) {
@@ -142,8 +141,9 @@ class _WardrobeAddPageState extends State<WardrobeAddPage> {
         headers: {'Content-Type': contentType},
       );
 
-      if (response.data != null) {
-        if (mounted) context.go('/wardrobe');
+      if (response.data != null && mounted) {
+        _state.reset();
+        context.go('/wardrobe', extra: true);
       }
     } on FunctionException catch (e) {
       debugPrint('Edge Function Error: $e, Details: ${e.details}');
