@@ -3,8 +3,6 @@ CREATE TABLE IF NOT EXISTS public.outfits (
     user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     name text,
     description text,
-    occasion_tag_id bigint REFERENCES public.tags(id) ON DELETE SET NULL,
-    weather_tag_id bigint REFERENCES public.tags(id) ON DELETE SET NULL,
     rating integer,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     edited_at timestamp with time zone DEFAULT now() NOT NULL
