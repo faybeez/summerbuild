@@ -6,7 +6,6 @@ INSERT INTO "storage"."buckets" (
     "updated_at",
     "public",
     "avif_autodetection",
-    "file_size_limit",
     "allowed_mime_types",
     "owner_id",
     "type"
@@ -18,7 +17,6 @@ INSERT INTO "storage"."buckets" (
     now(),
     false,
     false,
-    1048576,
     NULL,
     NULL,
     'STANDARD'

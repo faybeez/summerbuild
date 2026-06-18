@@ -24,8 +24,6 @@ import 'features/pages/wardrobe/wardrobe_page.dart';
 import 'features/pages/wardrobe/add_item/wardrobe_add_page.dart';
 import 'features/pages/wardrobe/wardrobe_detail_page.dart';
 
-import 'features/pages/calendar/calendar_page.dart';
-
 import 'features/pages/home/home_page.dart';
 
 import 'features/pages/explore/explore_page.dart';
@@ -36,6 +34,13 @@ import 'features/data/tags_repository.dart';
 import 'features/data/wardrobe_repository.dart';
 import 'features/data/outfit_repository.dart';
 
+import 'features/pages/calendar/pages/calendar_page.dart';
+import 'features/pages/calendar/pages/calendar_day_recap_page.dart';
+import 'features/pages/calendar/pages/event_edit_page.dart';
+import 'features/pages/calendar/pages/ootd_edit_page.dart';
+import 'features/pages/calendar/data/calendar_repository.dart';
+
+CalendarRepository? _calendarRepository;
 TagsRepository? _tagsRepository;
 WardrobeRepository? _wardrobeRepository;
 OutfitRepository? _outfitRepository;
@@ -104,10 +109,27 @@ OutfitRepository getOutfitRepository() {
   return _outfitRepository!;
 }
 
+CalendarRepository getCalendarRepository() {
+  final supabase = Supabase.instance.client;
+  final user = supabase.auth.currentUser;
+  if (user == null) {
+    throw StateError(
+      'CalendarRepository cannot be created without a logged-in user.',
+    );
+  }
+  final shouldCreate = _calendarRepository == null || _cachedUserId != user.id;
+  if (shouldCreate) {
+    _cachedUserId = user.id;
+    _calendarRepository = CalendarRepository(supabase);
+  }
+  return _calendarRepository!;
+}
+
 void clearUserScopedRepositories() {
   _tagsRepository = null;
   _wardrobeRepository = null;
   _outfitRepository = null;
+  _calendarRepository = null;
   _cachedUserId = null;
 }
 
@@ -166,7 +188,6 @@ final GoRouter appRouter = GoRouter(
                 return WardrobeAddPage(tagsRepository: getTagsRepository());
               },
             ),
-            // NEW ─── detail route
             GoRoute(
               path: ':id',
               builder: (context, state) {
@@ -185,6 +206,53 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: '/calendar',
           builder: (context, state) => const CalendarPage(),
+          routes: [
+            GoRoute(
+              path: 'day',
+              builder: (context, state) {
+                final date = state.extra as DateTime? ?? DateTime.now();
+                return CalendarDayRecapPage(date: date);
+              },
+            ),
+            GoRoute(
+              path: 'event/new',
+              builder: (context, state) {
+                final prefillDate = state.extra as DateTime?;
+                return EventEditPage(prefillDate: prefillDate);
+              },
+            ),
+            GoRoute(
+              path: 'event/:id/edit',
+              builder: (context, state) {
+                final id = int.tryParse(state.pathParameters['id'] ?? '');
+                if (id == null) {
+                  return const Scaffold(
+                    body: Center(child: Text('Invalid event ID')),
+                  );
+                }
+                return EventEditPage(eventId: id);
+              },
+            ),
+            GoRoute(
+              path: 'ootd/new',
+              builder: (context, state) {
+                final prefillDate = state.extra as DateTime?;
+                return OotdEditPage(prefillDate: prefillDate);
+              },
+            ),
+            GoRoute(
+              path: 'ootd/:id/edit',
+              builder: (context, state) {
+                final id = int.tryParse(state.pathParameters['id'] ?? '');
+                if (id == null) {
+                  return const Scaffold(
+                    body: Center(child: Text('Invalid OOTD ID')),
+                  );
+                }
+                return OotdEditPage(ootdId: id);
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/studio',
