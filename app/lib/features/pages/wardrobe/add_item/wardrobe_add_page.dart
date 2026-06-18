@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../app_colors.dart';
-import '../../../../classes.dart';
+import '../../../../classes/classes.dart';
 import '../../../data/tags_repository.dart';
 
 import 'wardrobe_add_state.dart';

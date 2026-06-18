@@ -1,38 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'app_colors.dart';
-import 'functions.dart';
-
-class ClothingTag {
-  final int id;
-  final String tagType;
-  final String tagValue;
-  final String tagDisplayName;
-
-  const ClothingTag({
-    required this.id,
-    required this.tagType,
-    required this.tagValue,
-    required this.tagDisplayName,
-  });
-
-  factory ClothingTag.fromJson(Map<String, dynamic> json) {
-    return ClothingTag(
-      id: (json['id'] as num).toInt(),
-      tagType: (json['tag_type'] as String?) ?? '',
-      tagValue: (json['tag_value'] as String?) ?? '',
-      tagDisplayName:
-          (json['tag_display_name'] as String?) ??
-          (json['tag_value'] as String?) ??
-          '',
-    );
-  }
-
-  @override
-  String toString() {
-    return 'ClothingTag(id: $id, tagType: $tagType, tagValue: $tagValue, tagDisplayName: $tagDisplayName)';
-  }
-}
+import '../app_colors.dart';
+import '../functions.dart';
 
 class AppPage extends StatelessWidget {
   const AppPage({

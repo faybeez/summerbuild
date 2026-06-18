@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'supabase_config.dart';
 import 'app_colors.dart';
-import 'classes.dart';
+import 'classes/classes.dart';
 import 'functions.dart';
 import 'router.dart';
 
@@ -56,10 +56,10 @@ class WardrobeApp extends StatelessWidget {
               color: states.contains(WidgetState.selected)
                   ? AppColors.appEspresso
                   : AppColors.appEspresso.withAlpha(150),
-              fontSize: 12,
+              fontSize: 10,
               fontWeight: states.contains(WidgetState.selected)
-                  ? FontWeight.w800
-                  : FontWeight.w600,
+                  ? FontWeight.w600
+                  : FontWeight.w400,
             ),
           ),
           iconTheme: WidgetStateProperty.resolveWith(

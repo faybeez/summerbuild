@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../app_colors.dart';
-import '../../../classes.dart';
+import '../../../classes/classes.dart';
 
 class PersonalizationPage extends StatefulWidget {
   const PersonalizationPage({required this.profile, super.key});

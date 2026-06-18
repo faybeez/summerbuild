@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 import '../../../app_colors.dart';
-import '../../../classes.dart';
+import '../../../classes/classes.dart';
 import '../../services/weather_service.dart';
 
 import 'outfit_detail_page.dart';

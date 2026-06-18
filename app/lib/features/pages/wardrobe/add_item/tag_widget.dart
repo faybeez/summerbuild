@@ -1,6 +1,7 @@
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 import '../../../../app_colors.dart';
-import '../../../../classes.dart';
+import '../../../../classes/classes.dart';
 
 class TagGroupSection extends StatelessWidget {
   final String title;

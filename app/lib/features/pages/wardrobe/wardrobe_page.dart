@@ -1,10 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../app_colors.dart';
-import '../../../classes.dart';
+import '../../../classes/classes.dart';
 import '../../../functions.dart';
 import '../../data/tags_repository.dart';
 import '../../data/wardrobe_repository.dart';

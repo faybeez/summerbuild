@@ -1,7 +1,8 @@
 import 'dart:io';
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../classes.dart';
+import '../../../../classes/classes.dart';
 import '../../../data/tags_repository.dart';
 
 class WardrobeAddState {

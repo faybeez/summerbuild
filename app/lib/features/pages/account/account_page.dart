@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../classes.dart';
+import '../../../classes/classes.dart';
 
 import 'personalization_page.dart';
 import 'change_password_page.dart';

@@ -1,7 +1,8 @@
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 
-import '../../classes.dart';
+import '../../classes/classes.dart';
 
 class TagsRepository {
   TagsRepository(this._supabase);

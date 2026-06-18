@@ -5,6 +5,16 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class WeatherService {
+  static Map<String, dynamic>? _cachedWeather;
+  static DateTime? _lastFetched;
+
+  static const _cacheDuration = Duration(minutes: 30);
+
+  bool get _isCacheValid =>
+      _cachedWeather != null &&
+      _lastFetched != null &&
+      DateTime.now().difference(_lastFetched!) < _cacheDuration;
+
   Future<Position?> getUserLocation() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) return null;
@@ -43,6 +53,8 @@ class WeatherService {
   // fetch
   Future<Map<String, dynamic>> fetchWeather() async {
     debugPrint('Fetching weather data...');
+    if (_isCacheValid) return _cachedWeather!;
+
     Position? pos = await getUserLocation();
     debugPrint('User location: $pos');
     if (pos == null) throw Exception('Location unavailable');
@@ -131,14 +143,17 @@ class WeatherService {
     //   'Humid Station: $nearestHumidStation, Humidity: ${humidReading['value']}',
     // );
 
-    return {
+    _cachedWeather = {
       'area': nearestArea, //string
       'forecast': forecast['forecast']
           .toString()
           .replaceAll(RegExp(r'\s*\((Day|Night)\)', caseSensitive: false), '')
           .trim(), //string
-      'temperature': tempReading['value'], //double
-      'humidity': humidReading['value'], //double
+      'temperature': tempReading['value'] as double, //double
+      'humidity': humidReading['value'] as double, //double
     };
+    _lastFetched = DateTime.now();
+
+    return _cachedWeather!;
   }
 }

@@ -1,7 +1,8 @@
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import '../../../app_colors.dart';
-import '../../../classes.dart';
+import '../../classes/classes.dart';
 
 class AppTextField extends StatelessWidget {
   const AppTextField({

@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../app_colors.dart';
-import '../../../classes.dart';
+import '../../../classes/classes.dart';
 import '../../../functions.dart';
 
 class WardrobeDetailPage extends StatelessWidget {

@@ -1,0 +1,10 @@
+{
+  "tasks": {
+    "seed:storage:prod": "deno run --env-file=./.env.prod --allow-env --allow-net --allow-read scripts/seed-all.ts",
+    "seed:storage:local": "deno run --env-file=./.env.local --allow-env --allow-net --allow-read scripts/seed-all.ts"
+  },
+  "imports": {
+    "@supabase/functions-js/edge-runtime.d.ts": "jsr:@supabase/functions-js/edge-runtime.d.ts",
+    "@supabase/server": "npm:@supabase/server@^1"
+  }
+}

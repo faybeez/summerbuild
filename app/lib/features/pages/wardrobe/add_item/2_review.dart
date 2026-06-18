@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../app_colors.dart';
-import '../../../../classes.dart';
+import '../../../../classes/classes.dart';
 import 'tag_widget.dart';
 import 'wardrobe_add_state.dart';
 

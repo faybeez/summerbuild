@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 class MainShell extends StatelessWidget {
   final Widget child;
@@ -9,7 +10,8 @@ class MainShell extends StatelessWidget {
     '/wardrobe',
     '/calendar',
     '/home',
-    '/explore',
+    '/studio',
+    // '/explore',
     '/account',
   ];
 
@@ -29,13 +31,14 @@ class MainShell extends StatelessWidget {
         selectedIndex: _selectedIndex(context),
         onDestinationSelected: (index) => context.go(_tabs[index]),
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.checkroom), label: 'Wardrobe'),
+          NavigationDestination(icon: Icon(Symbols.dresser), label: 'Wardrobe'),
           NavigationDestination(
             icon: Icon(Icons.calendar_month),
             label: 'Calendar',
           ),
           NavigationDestination(icon: Icon(Icons.home), label: 'Home'),
-          NavigationDestination(icon: Icon(Icons.explore), label: 'Explore'),
+          NavigationDestination(icon: Icon(Symbols.checkroom), label: 'Studio'),
+          // NavigationDestination(icon: Icon(Icons.explore), label: 'Explore'),
           NavigationDestination(icon: Icon(Icons.person), label: 'Account'),
         ],
       ),

@@ -1,8 +1,9 @@
+import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../../../../supabase_config.dart';
 
-import '../../classes.dart';
+import '../../classes/classes.dart';
 
 class WardrobeClothingItem {
   final int id;
@@ -61,12 +62,12 @@ class WardrobeClothingItem {
       tags.where((t) => t.tagType.toUpperCase() == 'CATEGORY').firstOrNull;
 }
 
-class WardrobePage {
+class WardrobeItems {
   final List<WardrobeClothingItem> items;
   final bool hasMore;
   final String? cursor;
 
-  const WardrobePage({
+  const WardrobeItems({
     required this.items,
     required this.hasMore,
     required this.cursor,
@@ -78,7 +79,7 @@ class WardrobeRepository {
 
   final SupabaseClient _supabase;
 
-  Future<WardrobePage> fetchPage({String? cursor}) async {
+  Future<WardrobeItems> fetchPage({String? cursor}) async {
     final response = await _supabase.functions.invoke(
       'get-wardrobe',
       method: HttpMethod.get,
@@ -107,7 +108,7 @@ class WardrobeRepository {
 
     // debugPrint('Items: ${items}');
 
-    return WardrobePage(
+    return WardrobeItems(
       items: items.toList(),
       hasMore: json['hasMore'] as bool? ?? false,
       cursor: json['cursor'] as String?,
