@@ -1,5 +1,6 @@
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter/material.dart';
 
 import 'features/pages/auth/login_page.dart';
 import 'features/pages/auth/register_page.dart';
@@ -165,8 +166,22 @@ final GoRouter appRouter = GoRouter(
                 return WardrobeAddPage(tagsRepository: getTagsRepository());
               },
             ),
+            // NEW ─── detail route
+            GoRoute(
+              path: ':id',
+              builder: (context, state) {
+                final id = int.tryParse(state.pathParameters['id'] ?? '');
+                if (id == null) {
+                  return const Scaffold(
+                    body: Center(child: Text('Invalid item ID')),
+                  );
+                }
+                return WardrobeDetailPage(clothesId: id);
+              },
+            ),
           ],
         ),
+
         GoRoute(
           path: '/calendar',
           builder: (context, state) => const CalendarPage(),

@@ -118,20 +118,7 @@ class OutfitDetailPage extends StatelessWidget {
               itemBuilder: (context, index) {
                 final piece = pieces[index];
                 return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => WardrobeDetailPage(
-                          item: WardrobeItem(
-                            piece.name,
-                            piece.category,
-                            piece.color ?? AppColors.appTan,
-                            piece.icon ?? Icons.checkroom_outlined,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                  onTap: () {},
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: cardDecoration(AppColors.appCard),

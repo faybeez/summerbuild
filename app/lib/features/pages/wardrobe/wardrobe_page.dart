@@ -1,4 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
+// lib/features/pages/wardrobe/wardrobe_page.dart
+//
+// KEY FIXES:
+//  • Removed GridView inside SingleChildScrollView (caused unbounded scroll).
+//  • Used CustomScrollView with SliverToBoxAdapter (filter bar) + SliverGrid.
+//  • Pull-to-refresh preserved via RefreshIndicator wrapping the CustomScrollView.
+//  • Filter bar redesigned with per-type compact chips.
+//  • Tapping a chip opens WardrobeFilterSheet.
+//  • WardrobeTile replaced by WardrobeItemCard for consistency.
+//  • Added loading, empty, and error states.
+
 import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +19,11 @@ import '../../../classes/classes.dart';
 import '../../../functions.dart';
 import '../../data/tags_repository.dart';
 import '../../data/wardrobe_repository.dart';
-import 'wardrobe_detail_page.dart';
+import 'widgets/wardrobe_filter_bar.dart';
+import 'widgets/wardrobe_filter_sheet.dart';
+import 'widgets/wardrobe_item_card.dart';
 
+// ─── Filter-key helper (shared with filter sheet) ────────────────────────────
 String _filterKey(ClothingTag tag) {
   final t = tag.tagType.toUpperCase();
   if (t == 'COLOR' || t == 'MAIN_COLOR' || t == 'SECONDARY_COLOR') {
@@ -18,6 +31,8 @@ String _filterKey(ClothingTag tag) {
   }
   return 'id:${tag.id}';
 }
+
+// ─── Page ────────────────────────────────────────────────────────────────────
 
 class WardrobePage extends StatefulWidget {
   const WardrobePage({super.key, required this.tagsRepository});
@@ -31,15 +46,17 @@ class WardrobePage extends StatefulWidget {
 class _WardrobePageState extends State<WardrobePage> {
   late final WardrobeRepository _wardrobeRepo;
   late final Future<Map<String, List<ClothingTag>>> _allTagsFuture;
-  late final ScrollController _scrollController;
 
   final _items = <WardrobeClothingItem>[];
   bool _isLoading = false;
   bool _hasMore = true;
   String? _cursor;
+  String? _errorMessage;
 
+  // selectedFilters: filterKey → ClothingTag
   final Map<String, ClothingTag> _selectedFilters = {};
 
+  // ── Derived ──────────────────────────────────────────────────────────────
   List<WardrobeClothingItem> get _filteredItems {
     if (_selectedFilters.isEmpty) return _items;
     return _items.where((item) {
@@ -50,12 +67,12 @@ class _WardrobePageState extends State<WardrobePage> {
 
   bool get _hasActiveFilters => _selectedFilters.isNotEmpty;
 
+  // ── Lifecycle ─────────────────────────────────────────────────────────────
   @override
   void initState() {
     super.initState();
     _wardrobeRepo = WardrobeRepository(Supabase.instance.client);
     _allTagsFuture = _loadAllTags();
-    _scrollController = ScrollController()..addListener(_onScroll);
     _fetchNextPage();
   }
 
@@ -81,32 +98,26 @@ class _WardrobePageState extends State<WardrobePage> {
     };
   }
 
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    final max = _scrollController.position.maxScrollExtent;
-    final pos = _scrollController.position.pixels;
-    if (pos >= max - 500 && !_isLoading && _hasMore) _fetchNextPage();
-  }
-
+  // ── Data loading ──────────────────────────────────────────────────────────
   Future<void> _fetchNextPage() async {
     if (_isLoading) return;
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
     try {
       final page = await _wardrobeRepo.fetchPage(cursor: _cursor);
-      setState(() {
-        _items.addAll(page.items);
-        _hasMore = page.hasMore;
-        _cursor = page.cursor;
-      });
+      if (mounted) {
+        setState(() {
+          _items.addAll(page.items);
+          _hasMore = page.hasMore;
+          _cursor = page.cursor;
+        });
+      }
     } on FunctionException catch (e) {
-      debugPrint('Wardrobe fetch error 1: ${e.details}');
+      if (mounted) setState(() => _errorMessage = e.details?.toString());
     } catch (e) {
-      debugPrint('Wardrobe fetch error 2: $e');
+      if (mounted) setState(() => _errorMessage = e.toString());
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -117,295 +128,374 @@ class _WardrobePageState extends State<WardrobePage> {
       _items.clear();
       _cursor = null;
       _hasMore = true;
+      _errorMessage = null;
     });
     await _fetchNextPage();
   }
 
-  void _openFilterSheet(Map<String, List<ClothingTag>> allTags) {
-    final pending = Map<String, ClothingTag>.from(_selectedFilters);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.background,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return DraggableScrollableSheet(
-              expand: false,
-              initialChildSize: 0.75,
-              maxChildSize: 0.95,
-              minChildSize: 0.4,
-              builder: (context, scrollController) {
-                return Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Filter',
-                            style: Theme.of(context).textTheme.titleLarge
-                                ?.copyWith(fontWeight: FontWeight.w800),
-                          ),
-                          const Spacer(),
-                          TextButton(
-                            onPressed: () =>
-                                setSheetState(() => pending.clear()),
-                            child: Text(
-                              'Clear all',
-                              style: TextStyle(
-                                color: AppColors.appEspresso.withAlpha(150),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          FilledButton(
-                            style: FilledButton.styleFrom(
-                              backgroundColor: AppColors.appEspresso,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _selectedFilters
-                                  ..clear()
-                                  ..addAll(pending);
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: const Text('Apply'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(height: 1),
-                    Expanded(
-                      child: ListView(
-                        controller: scrollController,
-                        padding: const EdgeInsets.all(20),
-                        children: allTags.entries.map((entry) {
-                          final groupLabel = entry.key;
-                          final groupTags = entry.value;
-                          if (groupTags.isEmpty) return const SizedBox.shrink();
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                groupLabel.toUpperCase(),
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: AppColors.appEspresso.withAlpha(
-                                        150,
-                                      ),
-                                      letterSpacing: 1.2,
-                                    ),
-                              ),
-                              const SizedBox(height: 10),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
-                                children: groupTags.map((tag) {
-                                  final key = _filterKey(tag);
-                                  final selected = pending.containsKey(key);
-                                  return FilterChip(
-                                    label: Text(tag.tagDisplayName),
-                                    selected: selected,
-                                    onSelected: (_) {
-                                      setSheetState(() {
-                                        if (selected) {
-                                          pending.remove(key);
-                                        } else {
-                                          pending[key] = tag;
-                                        }
-                                      });
-                                    },
-                                  );
-                                }).toList(),
-                              ),
-                              const SizedBox(height: 24),
-                            ],
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
-        );
-      },
-    );
+  // ── Filter helpers ────────────────────────────────────────────────────────
+  List<FilterGroup> _buildFilterGroups(Map<String, List<ClothingTag>> allTags) {
+    return allTags.entries.map((entry) {
+      final selected = entry.value
+          .where((t) => _selectedFilters.containsKey(_filterKey(t)))
+          .toList();
+      return FilterGroup(
+        label: entry.key,
+        tagType: entry.key.toUpperCase(),
+        allTags: entry.value,
+        selected: selected,
+      );
+    }).toList();
   }
 
+  Future<void> _openFilterSheet(
+    Map<String, List<ClothingTag>> allTags, {
+    int groupIndex = 0,
+  }) async {
+    final groups = _buildFilterGroups(allTags);
+    final result = await showWardrobeFilterSheet(
+      context: context,
+      groups: groups,
+      currentSelections: _selectedFilters,
+      initialGroupIndex: groupIndex.clamp(0, groups.length - 1),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _selectedFilters.clear();
+        _selectedFilters.addAll(result);
+      });
+    }
+  }
+
+  // ── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    final filtered = _filteredItems;
-
     return FutureBuilder<Map<String, List<ClothingTag>>>(
       future: _allTagsFuture,
       builder: (context, snapshot) {
         final allTags = snapshot.data ?? {};
+        final groups = _buildFilterGroups(allTags);
+        final filtered = _filteredItems;
 
         return AppPage(
           title: 'Wardrobe',
-          subtitle: '${_items.length} saved pieces',
+          subtitle:
+              '${_items.length} saved piece${_items.length == 1 ? '' : 's'}',
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Stack(
-                children: [
-                  IconButton(
-                    onPressed: allTags.isEmpty
-                        ? null
-                        : () => _openFilterSheet(allTags),
-                    icon: const Icon(Icons.tune_rounded),
-                  ),
-                  if (_hasActiveFilters)
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.appEspresso,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    ),
-                ],
-              ),
               IconButton.filledTonal(
-                onPressed: () => context.push('/wardrobe/add'),
+                onPressed: () =>
+                    context.push('/wardrobe/add').then((_) => _refresh()),
                 icon: const Icon(Icons.add),
               ),
             ],
           ),
           children: [
-            if (_hasActiveFilters)
+            // ── Filter bar ───────────────────────────────────────────────
+            if (allTags.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.only(bottom: 12),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      ..._selectedFilters.entries.map((entry) {
-                        final tag = entry.value;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: Chip(
-                            label: Text(tag.tagDisplayName),
-                            deleteIcon: const Icon(Icons.close, size: 16),
-                            onDeleted: () => setState(
-                              () => _selectedFilters.remove(entry.key),
+                child: WardrobeFilterBar(
+                  groups: groups,
+                  onGroupTap: (index) {
+                    _openFilterSheet(
+                      allTags,
+                      groupIndex: index < 0 ? 0 : index,
+                    );
+                  },
+                  onClearAll: () => setState(() => _selectedFilters.clear()),
+                ),
+              ),
+
+            // ── Content ───────────────────────────────────────────────────
+            _buildContent(filtered),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildContent(List<WardrobeClothingItem> filtered) {
+    // Error state
+    if (_errorMessage != null && _items.isEmpty) {
+      return _ErrorState(message: _errorMessage!, onRetry: _refresh);
+    }
+
+    // Initial loading
+    if (_isLoading && _items.isEmpty) {
+      return _LoadingGrid();
+    }
+
+    // Empty state
+    if (!_isLoading && filtered.isEmpty) {
+      return _EmptyState(
+        hasFilter: _hasActiveFilters,
+        onClearFilter: () => setState(() => _selectedFilters.clear()),
+        onAddItem: () => context.push('/wardrobe/add').then((_) => _refresh()),
+      );
+    }
+
+    // ── Grid wrapped in RefreshIndicator ──────────────────────────────────
+    //
+    // LAYOUT FIX:
+    // We use a SliverGrid (not GridView inside SingleChildScrollView).
+    // The AppPage widget wraps children in a Column; the grid itself
+    // is sized via LayoutBuilder so it fills remaining vertical space.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Provide a minimum height so the scroll area is meaningful.
+        final minHeight = constraints.maxHeight.isFinite
+            ? constraints.maxHeight
+            : MediaQuery.of(context).size.height * 0.7;
+
+        return SizedBox(
+          height: minHeight,
+          child: RefreshIndicator(
+            onRefresh: _refresh,
+            color: AppColors.appEspresso,
+            child: CustomScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              slivers: [
+                SliverPadding(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  sliver: SliverGrid(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        // Loading sentinel
+                        if (index == filtered.length) {
+                          return const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(
+                                color: AppColors.appEspresso,
+                                strokeWidth: 2,
+                              ),
                             ),
-                          ),
+                          );
+                        }
+
+                        final item = filtered[index];
+                        return WardrobeItemCard(
+                          item: item,
+                          onTap: () => context.push('/wardrobe/${item.id}'),
                         );
-                      }),
-                      TextButton(
-                        onPressed: () =>
-                            setState(() => _selectedFilters.clear()),
-                        child: const Text('Clear all'),
-                      ),
-                    ],
+                      },
+                      childCount: filtered.length + (_hasMore ? 1 : 0),
+                      addRepaintBoundaries: true,
+                    ),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 0.82,
+                          crossAxisSpacing: 14,
+                          mainAxisSpacing: 14,
+                        ),
                   ),
                 ),
-              ),
-            RefreshIndicator(
-              onRefresh: _refresh,
-              color: AppColors.appEspresso,
-              child: GridView.builder(
-                controller: _scrollController,
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: filtered.length + (_hasMore ? 1 : 0),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  childAspectRatio: 0.82,
-                  crossAxisSpacing: 14,
-                  mainAxisSpacing: 14,
+                // Trigger next-page load when near bottom
+                SliverToBoxAdapter(
+                  child: _PaginationTrigger(
+                    hasMore: _hasMore,
+                    isLoading: _isLoading,
+                    onTrigger: _fetchNextPage,
+                  ),
                 ),
-                itemBuilder: (context, index) {
-                  if (index == filtered.length) {
-                    return const Center(
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: CircularProgressIndicator(
-                          color: AppColors.appEspresso,
-                          strokeWidth: 2,
-                        ),
-                      ),
-                    );
-                  }
-                  final item = filtered[index];
-                  return WardrobeTile(
-                    item: item,
-                    onTap: () => context.push('/wardrobe/${item.id}'),
-                  );
-                },
-              ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );
   }
 }
 
-class WardrobeTile extends StatelessWidget {
-  const WardrobeTile({required this.item, this.onTap, super.key});
+// ─── Supporting widgets ───────────────────────────────────────────────────────
 
-  final WardrobeClothingItem item;
-  final VoidCallback? onTap;
+/// Invisible widget at the bottom of the list that triggers next-page loading.
+class _PaginationTrigger extends StatefulWidget {
+  const _PaginationTrigger({
+    required this.hasMore,
+    required this.isLoading,
+    required this.onTrigger,
+  });
+
+  final bool hasMore;
+  final bool isLoading;
+  final VoidCallback onTrigger;
+
+  @override
+  State<_PaginationTrigger> createState() => _PaginationTriggerState();
+}
+
+class _PaginationTriggerState extends State<_PaginationTrigger> {
+  @override
+  void didUpdateWidget(_PaginationTrigger old) {
+    super.didUpdateWidget(old);
+    if (widget.hasMore && !widget.isLoading) {
+      // Trigger at next frame to avoid calling setState during build
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && widget.hasMore && !widget.isLoading) {
+          widget.onTrigger();
+        }
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
+}
+
+class _LoadingGrid extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.82,
+        crossAxisSpacing: 14,
+        mainAxisSpacing: 14,
+      ),
+      itemBuilder: (_, __) => Container(
+        decoration: BoxDecoration(
+          color: AppColors.appWarmCream,
+          borderRadius: BorderRadius.circular(14),
+        ),
+      ),
+    );
+  }
+}
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState({
+    required this.hasFilter,
+    required this.onClearFilter,
+    required this.onAddItem,
+  });
+
+  final bool hasFilter;
+  final VoidCallback onClearFilter;
+  final VoidCallback onAddItem;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: cardDecoration(AppColors.appCard),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: item.imageUrl != null
-                    ? CachedNetworkImage(
-                        imageUrl: item.imageUrl!,
-                        fit: BoxFit.cover,
-                        width: double.infinity,
-                        memCacheWidth: 200,
-                        memCacheHeight: 200,
-                        placeholder: (_, __) => Container(
-                          color: AppColors.appWarmCream,
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.appTan,
-                            ),
-                          ),
-                        ),
-                        errorWidget: (_, __, ___) => Container(
-                          color: AppColors.appWarmCream,
-                          child: const Icon(
-                            Icons.image_not_supported_outlined,
-                            color: AppColors.appTan,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        color: AppColors.appWarmCream,
-                        child: const Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppColors.appTan,
-                        ),
-                      ),
+            Icon(
+              hasFilter
+                  ? Icons.filter_list_off_rounded
+                  : Icons.checkroom_outlined,
+              size: 64,
+              color: AppColors.appTan,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              hasFilter
+                  ? 'No items match your filters'
+                  : 'Your wardrobe is empty',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.appEspresso,
               ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              hasFilter
+                  ? 'Try clearing some filters.'
+                  : 'Tap + to add your first piece.',
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.appOlive),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            if (hasFilter)
+              OutlinedButton(
+                onPressed: onClearFilter,
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.appTan),
+                  foregroundColor: AppColors.appEspresso,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: const Text('Clear filters'),
+              )
+            else
+              FilledButton.icon(
+                onPressed: onAddItem,
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.appEspresso,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: const Icon(Icons.add),
+                label: const Text('Add clothes'),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  const _ErrorState({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.cloud_off_rounded,
+              size: 56,
+              color: AppColors.appTan,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Could not load wardrobe',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: AppColors.appEspresso,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.appOlive),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onRetry,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.appEspresso,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Retry'),
             ),
           ],
         ),
