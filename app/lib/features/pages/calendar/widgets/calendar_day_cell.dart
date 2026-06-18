@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elytsx/app_colors.dart';
-import '../models/calendar_day_summary.dart';
+import '../../../../classes/calendar_day_summary.dart';
 import 'calendar_dot_indicator.dart';
 
 class CalendarDayCell extends StatelessWidget {

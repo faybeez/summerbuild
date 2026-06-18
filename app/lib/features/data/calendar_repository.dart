@@ -2,9 +2,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../models/calendar_event.dart';
-import '../models/calendar_day_summary.dart';
-import '../models/ootd_entry.dart';
+import '../../classes/calendar_event.dart';
+import '../../classes/calendar_day_summary.dart';
+import '../../classes/ootd_entry.dart';
 
 class CalendarRepository {
   CalendarRepository(this._supabase);
@@ -58,10 +58,7 @@ class CalendarRepository {
       }
     }
 
-    final allDates = {
-      ...eventCountByDate.keys,
-      ...ootdIdByDate.keys,
-    };
+    final allDates = {...eventCountByDate.keys, ...ootdIdByDate.keys};
 
     return allDates.map((dateStr) {
       return CalendarDaySummary(
@@ -320,8 +317,7 @@ class CalendarRepository {
 
       // Upload new photo
       final newPath = '$_userId/$ootdId.$newImageType';
-      await _uploadOotdFile(
-          photoFile: replacementPhotoFile, path: newPath);
+      await _uploadOotdFile(photoFile: replacementPhotoFile, path: newPath);
     }
 
     final updatePayload = {
@@ -403,12 +399,18 @@ class CalendarRepository {
 
     // Link clothes
     if (clothesIds.isNotEmpty) {
-      final clothesPayload = clothesIds.asMap().entries.map((e) => {
-            'outfit_id': outfitId,
-            'clothes_id': e.value,
-            'slot': 'OUTFIT',
-            'sort_order': e.key,
-          }).toList();
+      final clothesPayload = clothesIds
+          .asMap()
+          .entries
+          .map(
+            (e) => {
+              'outfit_id': outfitId,
+              'clothes_id': e.value,
+              'slot': 'OUTFIT',
+              'sort_order': e.key,
+            },
+          )
+          .toList();
       await _supabase.from('outfit_clothes').insert(clothesPayload);
     }
 
@@ -445,7 +447,9 @@ class CalendarRepository {
   }) async {
     if (photoFile is File) {
       final bytes = await photoFile.readAsBytes();
-      await _supabase.storage.from('ootd_images').uploadBinary(
+      await _supabase.storage
+          .from('ootd_images')
+          .uploadBinary(
             path,
             bytes,
             fileOptions: FileOptions(
@@ -466,7 +470,10 @@ class CalendarRepository {
       final result = await _supabase.storage
           .from('ootd_images')
           .createSignedUrls([path], 3600);
-      return result.where((s) => s.signedUrl != null).map((s) => s.signedUrl!).firstOrNull;
+      return result
+          .where((s) => s.signedUrl != null)
+          .map((s) => s.signedUrl!)
+          .firstOrNull;
     } catch (e) {
       debugPrint('_buildOotdImageUrl failed (non-fatal): $e');
       return null;

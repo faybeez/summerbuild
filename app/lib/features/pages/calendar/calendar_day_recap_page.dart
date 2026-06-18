@@ -4,10 +4,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:elytsx/app_colors.dart';
 import 'package:intl/intl.dart';
 
-import '../data/calendar_repository.dart';
-import '../models/calendar_event.dart';
-import '../models/ootd_entry.dart';
-import '../widgets/ootd_card.dart';
+import '../../data/calendar_repository.dart';
+import '../../../classes/calendar_event.dart';
+import '../../../classes/ootd_entry.dart';
+import 'widgets/ootd_card.dart';
 
 class CalendarDayRecapPage extends StatefulWidget {
   const CalendarDayRecapPage({super.key, required this.date});

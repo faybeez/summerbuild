@@ -5,9 +5,9 @@ import 'package:elytsx/app_colors.dart';
 import 'package:elytsx/features/data/outfit_repository.dart';
 import 'package:intl/intl.dart';
 
-import '../data/calendar_repository.dart';
-import '../models/calendar_event.dart';
-import '../widgets/outfit_picker.dart';
+import '../../data/calendar_repository.dart';
+import '../../../classes/calendar_event.dart';
+import 'widgets/outfit_picker.dart';
 
 class EventEditPage extends StatefulWidget {
   const EventEditPage({super.key, this.eventId, this.prefillDate});

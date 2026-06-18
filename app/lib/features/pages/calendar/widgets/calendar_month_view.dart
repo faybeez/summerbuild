@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elytsx/app_colors.dart';
-import '../models/calendar_day_summary.dart';
+import '../../../../classes/calendar_day_summary.dart';
 import 'calendar_day_cell.dart';
 
 class CalendarMonthView extends StatelessWidget {

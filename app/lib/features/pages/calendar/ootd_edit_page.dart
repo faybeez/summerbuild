@@ -9,11 +9,11 @@ import 'package:elytsx/features/data/wardrobe_repository.dart';
 import 'package:elytsx/classes/clothing_tag.dart';
 import 'package:intl/intl.dart';
 
-import '../data/calendar_repository.dart';
-import '../models/ootd_entry.dart';
-import '../models/calendar_event.dart';
-import '../widgets/outfit_picker.dart';
-import '../widgets/wardrobe_piece_picker.dart';
+import '../../data/calendar_repository.dart';
+import '../../../classes/ootd_entry.dart';
+import '../../../classes/calendar_event.dart';
+import 'widgets/outfit_picker.dart';
+import 'widgets/wardrobe_piece_picker.dart';
 
 class OotdEditPage extends StatefulWidget {
   const OotdEditPage({super.key, this.ootdId, this.prefillDate});

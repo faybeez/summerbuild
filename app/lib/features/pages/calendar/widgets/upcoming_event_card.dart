@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elytsx/app_colors.dart';
-import '../models/calendar_event.dart';
+import '../../../../classes/calendar_event.dart';
 
 class UpcomingEventCard extends StatelessWidget {
   const UpcomingEventCard({

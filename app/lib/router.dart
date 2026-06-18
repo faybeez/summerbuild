@@ -34,11 +34,11 @@ import 'features/data/tags_repository.dart';
 import 'features/data/wardrobe_repository.dart';
 import 'features/data/outfit_repository.dart';
 
-import 'features/pages/calendar/pages/calendar_page.dart';
-import 'features/pages/calendar/pages/calendar_day_recap_page.dart';
-import 'features/pages/calendar/pages/event_edit_page.dart';
-import 'features/pages/calendar/pages/ootd_edit_page.dart';
-import 'features/pages/calendar/data/calendar_repository.dart';
+import 'features/pages/calendar/calendar_page.dart';
+import 'features/pages/calendar/calendar_day_recap_page.dart';
+import 'features/pages/calendar/event_edit_page.dart';
+import 'features/pages/calendar/ootd_edit_page.dart';
+import 'features/data/calendar_repository.dart';
 
 CalendarRepository? _calendarRepository;
 TagsRepository? _tagsRepository;

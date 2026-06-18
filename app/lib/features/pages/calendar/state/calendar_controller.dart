@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
-import '../data/calendar_repository.dart';
-import '../models/calendar_day_summary.dart';
-import '../models/calendar_event.dart';
-import '../models/ootd_entry.dart';
+import '../../../data/calendar_repository.dart';
+import '../../../../classes/calendar_day_summary.dart';
+import '../../../../classes/calendar_event.dart';
+import '../../../../classes/ootd_entry.dart';
 
 class CalendarController extends ChangeNotifier {
   CalendarController(this._repository);
@@ -24,10 +24,14 @@ class CalendarController extends ChangeNotifier {
   String? get error => _error;
 
   CalendarDaySummary? summaryFor(DateTime date) {
-    return _monthSummaries.where((s) =>
-        s.date.year == date.year &&
-        s.date.month == date.month &&
-        s.date.day == date.day).firstOrNull;
+    return _monthSummaries
+        .where(
+          (s) =>
+              s.date.year == date.year &&
+              s.date.month == date.month &&
+              s.date.day == date.day,
+        )
+        .firstOrNull;
   }
 
   // ── Actions ───────────────────────────────────────────────────────────────

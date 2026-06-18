@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:elytsx/app_colors.dart';
-import '../models/ootd_entry.dart';
+import '../../../../classes/ootd_entry.dart';
 
 class OotdCard extends StatelessWidget {
   const OotdCard({super.key, required this.ootd, required this.onEdit});
