@@ -1,4 +1,48 @@
-# SummerBuild
+# Elytsx
+
+## Inspiration
+
+Most people own more clothes than they realise yet still feel like they have nothing to wear. We wanted to close that gap and reduce impulse buying by building a personal stylist that lives in your phone.
+
+## Demo Video
+
+[Watch the demo video here!](https://youtu.be/-6qqmskFUyU?si=lQXntvNEVz0fGvyk)
+
+## What it does
+
+Elytsx is an AI-powered wardrobe app for digitising, organising, and styling your clothes.
+
+- **Digital wardrobe** — photograph a piece; AI tags it with category, occasion, weather suitability, and colours automatically
+- **Taste profile** — a style quiz on first launch calibrates recommendations to your aesthetic
+- **OOTD** — two modes: fully AI-generated, or guided (feed in weather, occasion, vibe, or a specific piece to build around)
+- **Studio** — manually build and save outfits; browse history in a collage-style grid
+- **Calendar** — attach outfits to events and track what you wore each day
+
+## How we built it
+
+| Layer | Tech |
+|---|---|
+| Frontend | Flutter |
+| Backend | Supabase (Edge Functions + PostgreSQL + Storage) |
+| AI | Reka AI (multimodal vision) |
+
+Key decisions:
+- Repository pattern (`WardrobeRepository`, `OutfitRepository`, `TagsRepository`) keeps data fetching separate from UI
+- Supabase Edge Functions handle `save-wardrobe`, `get-wardrobe`, `create-outfit`, `get-outfits` with cursor-based pagination
+- Shared `WardrobeAddState` flows through the multi-step add-item flow (upload → AI tagging → review)
+
+## Accomplishments that we're proud of
+
+- End-to-end AI clothing classification — photo in, structured tags out via Reka
+- `ClothingTag` widget system with colour swatches and icon fallbacks across all screens
+- Full outfit creation flow (manual + AI) backed by real Edge Functions
+
+## What's next for Elytsx
+
+- AR virtual fitting room
+- Shopping recommendations based on wardrobe gaps and taste profile
+- Monthly style recaps and trend newsletters
+- Social sharing and community outfit ratings
 
 ## Starting the application
 
